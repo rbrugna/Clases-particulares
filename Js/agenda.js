@@ -1,11 +1,6 @@
 document.addEventListener("DOMContentLoaded",function() {
     const form=document.getElementById('form-turno');
     const tabla=document.getElementById("tabla-turnos");
-    const extraCampos=document.getElementById("extraCampos");
-    const materiaInput=document.getElementById("materia");
-    const alumnoInput=document.getElementById("alumno");
-
-    let indiceEdicion=null 
 
     function guardarEnLocalStorage(){
         localStorage.setItem("turnos",JSON.stringify(turnos));
@@ -21,7 +16,21 @@ document.addEventListener("DOMContentLoaded",function() {
 
         for (let i=0;i<turnos.length;i++){
             const t=turnos[i];
-            const fila= `
+
+            if (t.editando){
+                tabla.innerHTML+=`
+                <tr>
+                    <td>${t.dia}</td>
+                    <td>${t.hora}</td>
+                    <td><input type='text' id="materia-${i}" value="${t.materia||""}"></td>
+                    <td><input type='text' id="alumno-${i}" value="${t.alumno||""}"></td>
+                    <td>
+                        <button class="guardar" data-index="${i}">Guardar</button>
+                        <button class="cancelar" data-index="${i}">Cancelar</button>
+                    </td>
+                </tr>`;
+            } else{
+                tabla.innerHTML+=`
                 <tr>
                     <td>${t.dia}</td>
                     <td>${t.hora}</td>
@@ -31,9 +40,8 @@ document.addEventListener("DOMContentLoaded",function() {
                         <button class='editar' data-index="${i}">Editar</button>
                         <button class='eliminar' data-index="${i}">Eliminar</button>
                     </td>
-                </tr>
-            `;
-            tabla.innerHTML+=fila;
+                </tr>`;
+            }
         }
     }
 
@@ -42,32 +50,15 @@ document.addEventListener("DOMContentLoaded",function() {
 
         const dia=document.getElementById("dia").value;
         const hora=document.getElementById('hora').value;
-        const materia=materiaInput.value.trim();
-        const alumno=alumnoInput.value.trim();
 
-        if (indiceEdicion!==null){
-            //editando
-            const t = turnos[indiceEdicion];
-            t.dia = dia;
-            t.hora = hora;
-
-            if (extraCampos.style.display==="block"){
-                t.materia =materia || t.materia;
-                t.alumno = alumno || t.alumno;
-            }
-
-            indiceEdicion=null;
-            extraCampos.style.display='none';
-        }else {
-            const nuevoTurno={
-                dia: dia,
-                hora: hora,
-                materia: null,
-                alumno: null 
-            };
-
-            turnos.push(nuevoTurno);
-        }
+        const nuevoTurno={
+            dia: dia,
+            hora: hora,
+            materia: null,
+            alumno: null,
+            editando: false,
+        };
+        turnos.push(nuevoTurno)
 
         guardarEnLocalStorage();
         mostrarTurnos();
@@ -80,15 +71,32 @@ document.addEventListener("DOMContentLoaded",function() {
         // Si el boton tiene la clase editar
         if (boton.classList.contains('editar')){
             const index=boton.dataset.index; // lee el numero de fila
-            const t=turnos[index];
+            turnos[index].editando=true
+            mostrarTurnos();
+            return;
+        }
 
-            document.getElementById('dia').value =t.dia;
-            document.getElementById('hora').value=t.hora;
-            materiaInput.value=t.materia || "";
-            alumnoInput.value = t.alumno || "";
+        // Si el boton tiene la clase guardar
+        if (boton.classList.contains('guardar')){
+            const index=boton.dataset.index;
+            const materiaInput=document.getElementById(`materia-${index}`).value.trim();
+            const alumnoInput=document.getElementById(`alumno-${index}`).value.trim();
 
-            indiceEdicion=index 
-            extraCampos.style.display="block";
+            turnos[index].materia = materiaInput;
+            turnos[index].alumno = alumnoInput;
+            turnos[index].editando = false;
+
+            guardarEnLocalStorage();
+            mostrarTurnos();
+            return;
+        }
+
+        // Si el boton tiene la clase cancelar
+        if (boton.classList.contains("cancelar")){
+            const index=boton.dataset.index;
+            turnos[index].editando = false;
+            mostrarTurnos();
+            return;
         }
 
         // Si el boton tiene la clase eliminar
@@ -103,5 +111,3 @@ document.addEventListener("DOMContentLoaded",function() {
     });
     mostrarTurnos();
 });
-
-
