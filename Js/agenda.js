@@ -4,6 +4,10 @@ document.addEventListener("DOMContentLoaded",function() {
 
     let indiceEdicion=null 
 
+    function guardarEnLocalStorage(){
+        localStorage.setItem("turnos",JSON.stringify(turnos));
+    }
+
     function mostrarTurnos() {
         tabla.innerHTML='';
 
@@ -50,6 +54,7 @@ document.addEventListener("DOMContentLoaded",function() {
             turnos.push(nuevoTurno);
         }
 
+        guardarEnLocalStorage();
         mostrarTurnos();
 
         form.reset();
@@ -72,7 +77,8 @@ document.addEventListener("DOMContentLoaded",function() {
         if (boton.classList.contains('eliminar')){
             const index = boton.dataset.index;
             if (confirm("Seguro que quieres eliminar este horario?")){
-                turnos.splice(index,1); 
+                turnos.splice(index,1);
+                guardarEnLocalStorage(); 
                 mostrarTurnos();
             }
         }

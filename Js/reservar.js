@@ -5,6 +5,12 @@ document.addEventListener("DOMContentLoaded", function(){
     const materiaAlumno=document.getElementById("materiaAlumno");
     const indiceTurno=document.getElementById("indiceTurno");
 
+    let turnos= JSON.parse(localStorage.getItem("turnos")) || [];
+
+    function guardarEnLocalStorage(){
+        localStorage.setItem("turnos",JSON.stringify(turnos));
+    }
+
     function mostrarTurnosDisponibles(){
         tabla.innerHTML="";
 
@@ -52,8 +58,9 @@ document.addEventListener("DOMContentLoaded", function(){
 
         turnos[i].alumno=nombre;
         turnos[i].materia=materia;
-        alert(`Reserva confirmada para ${nombre} en ${materia}.`);
+        guardarEnLocalStorage();
 
+        alert(`Reserva confirmada para ${nombre} en ${materia}.`);
         form.reset();
         mostrarTurnosDisponibles();
     });

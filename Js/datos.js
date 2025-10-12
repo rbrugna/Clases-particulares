@@ -1,1 +1,1 @@
-let turnos=[]
+let turnos=JSON.parse(localStorage.getItem("turnos")) || [];
