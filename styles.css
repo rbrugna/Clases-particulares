@@ -1,0 +1,164 @@
+:root {
+    --verde: #28a745;
+    --gris-claro: #f2f2f2;
+    --gris: #d1d1d1;
+    --gris-oscuro: #333;
+    --negro: #111;
+    --blanco: #fff;
+}
+
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background-color: var(--gris-claro);
+    color: var(--negro);
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: var(--negro);
+    color: var(--blanco);
+    padding: 15px 0;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+nav a {
+    color: var(--blanco);
+    text-decoration: none;
+    margin: 0 10px;
+    font-weight: 500;
+}
+
+nav a:hover {
+    color: var(--verde);
+}
+
+main {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: var(--blanco);
+    border: 1px solid var(--gris);
+    border-radius: 10px;
+}
+
+h1, h2, h3 {
+    text-align: center;
+    color: var(--negro);
+    font-weight: 600;
+}
+
+h2 {
+    margin-top: 30px;
+    font-size: 1.2rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    border: 1px solid var(--gris);
+    padding: 10px;
+    text-align: center;
+}
+
+table th {
+    background-color: var(--gris-oscuro);
+    color: var(--blanco);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+table tr:nth-child(even) {
+    background-color: var(--gris-claro);
+}
+
+table tr:hover {
+    background-color: #e3e3e3;
+}
+
+form {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid var(--gris);
+    border-radius: 8px;
+    background-color: var(--gris-claro);
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid var(--gris);
+    border-radius: 5px;
+    font-size: 0.95rem;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border: 1px solid var(--verde);
+}
+
+button, .btn {
+    background-color: var(--verde);
+    color: var(--blanco);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+button:hover, .btn:hover {
+    background-color: #1e7a35;
+    transform: scale(1.02);
+}
+
+button.eliminar {
+    background-color: #444;
+}
+
+button.eliminar:hover {
+    background-color: #000;
+}
+
+footer {
+    background-color: var(--negro);
+    color: var(--blanco);
+    text-align: center;
+    padding: 15px 0;
+    margin-top: 40px;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    main {
+    width: 90%;
+    padding: 15px;
+    }
+
+    table th, table td {
+    font-size: 0.85rem;
+    }
+
+    button {
+    width: 100%;
+    margin-bottom: 8px;
+    }
+}
