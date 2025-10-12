@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title> Agenda del profesor </title>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="agenda.html">Agenda del profesor</a>
+            <a href="reservar.html">Reservar Clase</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Agenda del profesor</h1>
+
+        <section>
+            <h2>Agregar horarios disponibles</h2>
+            <form id="form-turno">
+
+                <label>Dia:
+                    <select id="dia" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="Lunes">Lunes</option>
+                        <option value="Martes">Martes</option>
+                        <option value="Miercoles">Miercoles</option>
+                        <option value="Jueves">Jueves</option>
+                        <option value="Viernes">Viernes</option>
+                    </select>
+                </label>
+
+                <label>Hora:
+                    <input type="time" id="hora" required>
+                </label>
+
+                <button type="submit">Agregar horario</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Agenda completa</h2>
+            <table border="1" width="100%">
+                <thead>
+                    <tr>
+                        <th>Dia</th>
+                        <th>Hora</th>
+                        <th>Materia</th>
+                        <th>Alumno</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-turnos"></tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <small>© 2025 - Profesora Particular </small>
+    </footer>
+
+    <script src="js/datos.js"></script>
+    <script src="js/agenda.js"></script>
+
+</body>
+</html>

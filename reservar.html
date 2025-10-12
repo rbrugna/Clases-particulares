@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Reservar clase</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="agenda.html">Agenda del profesor</a>
+            <a href="reservar.html">Reservar Clase</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Reservar una clase</h1>
+
+        <section>
+            <h2>Horarios disponibles</h2>
+            <table border="1" width="100%">
+                <thead>
+                    <tr>
+                        <th>Dia</th>
+                        <th>Hora</th>
+                        <th>Reservar</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-reservas"></tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>Completa tu clase</h2>
+            <form id="form-reserva">
+                <label>Tu nombre:
+                    <input type="text" id="nombreAlumno" required>
+                </label>
+                <label>Materia que queres aprender:
+                    <input type="text" id="materiaAlumno" required>
+                </label>
+                <input type="hidden" id="indiceTurno"> <!--Que clase se esta guardando-->
+                <button type="submit">Confirmar reserva</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <small>© 2025. Sitio de clases particulares</small>
+    </footer>
+
+    <script src="js/datos.js"></script>
+    <script src="js/reservar.js"></script>
+</body>
+</html>
