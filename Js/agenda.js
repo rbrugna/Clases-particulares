@@ -48,7 +48,15 @@ document.addEventListener("DOMContentLoaded",function() {
         };
 
         if (indiceEdicion!==null){
-            turnos[indiceEdicion]=nuevoTurno;
+            const t=turnos[indiceEdicion];
+
+            const materia=document.getElementById("materia").value.trim();
+            const alumno=document.getElementById("alumno").value.trim();
+
+            t.dia = dia || t.dia;
+            t.hora = hora || t.hora;
+            t.materia = materia || t.materia;
+            t.alumno = alumno || t.alumno
             indiceEdicion=null;
         } else {
             turnos.push(nuevoTurno);
