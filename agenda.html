@@ -22,7 +22,7 @@
             <form id="form-turno">
 
                 <label>Dia:
-                    <select id="dia">
+                    <select id="dia" required>
                         <option value="">Seleccionar...</option>
                         <option value="Lunes">Lunes</option>
                         <option value="Martes">Martes</option>
@@ -33,18 +33,19 @@
                 </label>
 
                 <label>Hora:
-                    <input type="time" id="hora">
+                    <input type="time" id="hora" required>
                 </label>
 
-                <label>Materia:
-                    <input type="text" id="materia">
-                </label>
+                <button type="submit">Agregar horario</button>
 
-                <label>Alumno:
-                    <input type="text" id="alumno">
-                </label>
-
-                <button type="submit">Guardar</button>
+                <div id="extraCampos" style="display:none;margin-top: 10px;">
+                    <label>Materia:
+                        <input type="text" id="materia">
+                    </label>
+                    <label>Alumno 
+                        <input type="text" id="alumno">
+                    </label>
+                </div>
             </form>
         </section>
 

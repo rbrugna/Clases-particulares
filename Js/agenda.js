@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded",function() {
     const form=document.getElementById('form-turno');
     const tabla=document.getElementById("tabla-turnos");
+    const extraCampos=document.getElementById("extraCampos");
+    const materiaInput=document.getElementById("materia");
+    const alumnoInput=document.getElementById("alumno");
 
     let indiceEdicion=null 
 
@@ -39,32 +42,35 @@ document.addEventListener("DOMContentLoaded",function() {
 
         const dia=document.getElementById("dia").value;
         const hora=document.getElementById('hora').value;
-
-        const nuevoTurno={
-            dia: dia,
-            hora: hora,
-            materia: null,
-            alumno: null 
-        };
+        const materia=materiaInput.value.trim();
+        const alumno=alumnoInput.value.trim();
 
         if (indiceEdicion!==null){
-            const t=turnos[indiceEdicion];
+            //editando
+            const t = turnos[indiceEdicion];
+            t.dia = dia;
+            t.hora = hora;
 
-            const materia=document.getElementById("materia").value.trim();
-            const alumno=document.getElementById("alumno").value.trim();
+            if (extraCampos.style.display==="block"){
+                t.materia =materia || t.materia;
+                t.alumno = alumno || t.alumno;
+            }
 
-            t.dia = dia || t.dia;
-            t.hora = hora || t.hora;
-            t.materia = materia || t.materia;
-            t.alumno = alumno || t.alumno
             indiceEdicion=null;
-        } else {
+            extraCampos.style.display='none';
+        }else {
+            const nuevoTurno={
+                dia: dia,
+                hora: hora,
+                materia: null,
+                alumno: null 
+            };
+
             turnos.push(nuevoTurno);
         }
 
         guardarEnLocalStorage();
         mostrarTurnos();
-
         form.reset();
     });
 
@@ -78,7 +84,11 @@ document.addEventListener("DOMContentLoaded",function() {
 
             document.getElementById('dia').value =t.dia;
             document.getElementById('hora').value=t.hora;
+            materiaInput.value=t.materia || "";
+            alumnoInput.value = t.alumno || "";
+
             indiceEdicion=index 
+            extraCampos.style.display="block";
         }
 
         // Si el boton tiene la clase eliminar
