@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function(){
     function mostrarTurnosDisponibles(){
         tabla.innerHTML="";
 
-        const libres=turnos.filter(t=>t.alumno ===null);
+        const libres=turnos.filter(t=>!t.alumno);
 
         if (libres.length ===0){
             tabla.innerHTML='<tr><td colspan="3">No hay horarios disponibles.</td></tr>';
