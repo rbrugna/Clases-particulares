@@ -1,38 +1,41 @@
 :root {
-    --verde: #28a745;
-    --gris-claro: #f2f2f2;
-    --gris: #d1d1d1;
-    --gris-oscuro: #333;
+    --verde: #26c281;
+    --verde-oscuro: #1e8a5f;
+    --gris-fondo: #f7f7f7;
+    --gris-borde: #e0e0e0;
     --negro: #111;
     --blanco: #fff;
 }
 
 body {
-    font-family: 'Poppins', Arial, sans-serif;
-    background-color: var(--gris-claro);
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--gris-fondo);
     color: var(--negro);
     margin: 0;
     padding: 0;
+    line-height: 1.6;
 }
 
 header {
     background-color: var(--negro);
     color: var(--blanco);
-    padding: 15px 0;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 header h1 {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-    text-transform: uppercase;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
 }
 
 nav a {
     color: var(--blanco);
     text-decoration: none;
-    margin: 0 10px;
+    margin: 0 15px;
     font-weight: 500;
+    transition: color 0.3s;
 }
 
 nav a:hover {
@@ -40,125 +43,126 @@ nav a:hover {
 }
 
 main {
-    max-width: 1000px;
+    max-width: 950px;
     margin: 40px auto;
-    padding: 20px;
+    padding: 30px;
     background-color: var(--blanco);
-    border: 1px solid var(--gris);
-    border-radius: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--gris-borde);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
 }
 
 h1, h2, h3 {
     text-align: center;
-    color: var(--negro);
+    margin-bottom: 20px;
     font-weight: 600;
 }
 
 h2 {
-    margin-top: 30px;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
+    color: var(--verde-oscuro);
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
-}
-
-table th, table td {
-    border: 1px solid var(--gris);
-    padding: 10px;
-    text-align: center;
+    margin-top: 25px;
 }
 
 table th {
-    background-color: var(--gris-oscuro);
+    background-color: var(--verde);
     color: var(--blanco);
     text-transform: uppercase;
     font-weight: 600;
     letter-spacing: 0.5px;
+    padding: 12px;
 }
 
-table tr:nth-child(even) {
-    background-color: var(--gris-claro);
+table td {
+    border-bottom: 1px solid var(--gris-borde);
+    padding: 10px;
+    text-align: center;
 }
 
 table tr:hover {
-    background-color: #e3e3e3;
+    background-color: #f1f1f1;
+    transition: 0.2s;
 }
 
 form {
-    margin-top: 20px;
-    padding: 20px;
-    border: 1px solid var(--gris);
-    border-radius: 8px;
-    background-color: var(--gris-claro);
+    background-color: var(--gris-fondo);
+    padding: 25px;
+    border-radius: 10px;
+    border: 1px solid var(--gris-borde);
 }
 
 label {
-    display: block;
-    margin-bottom: 10px;
     font-weight: 500;
+    margin-bottom: 6px;
+    display: block;
 }
 
 input, select {
     width: 100%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border: 1px solid var(--gris);
-    border-radius: 5px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid var(--gris-borde);
     font-size: 0.95rem;
 }
 
 input:focus, select:focus {
     outline: none;
-    border: 1px solid var(--verde);
+    border-color: var(--verde);
+    box-shadow: 0 0 3px var(--verde);
 }
 
 button, .btn {
     background-color: var(--verde);
     color: var(--blanco);
     border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
+    padding: 10px 18px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: 0.2s ease;
+    font-weight: 500;
+    transition: 0.25s ease;
 }
 
 button:hover, .btn:hover {
-    background-color: #1e7a35;
-    transform: scale(1.02);
+    background-color: var(--verde-oscuro);
+    transform: scale(1.03);
 }
 
 button.eliminar {
-    background-color: #444;
+    background-color: #d9534f;
 }
 
 button.eliminar:hover {
-    background-color: #000;
+    background-color: #b52b27;
 }
 
 footer {
     background-color: var(--negro);
     color: var(--blanco);
     text-align: center;
-    padding: 15px 0;
-    margin-top: 40px;
+    padding: 18px 0;
+    margin-top: 50px;
     font-size: 0.9rem;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
 }
 
 @media (max-width: 768px) {
     main {
-    width: 90%;
-    padding: 15px;
+        width: 92%;
+        padding: 20px;
     }
 
     table th, table td {
-    font-size: 0.85rem;
+        font-size: 0.85rem;
+        padding: 8px;
     }
 
     button {
-    width: 100%;
-    margin-bottom: 8px;
+        width: 100%;
+        margin-bottom: 10px;
     }
 }
