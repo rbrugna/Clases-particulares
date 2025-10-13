@@ -147,12 +147,12 @@ tr:hover {
 }
 
 footer {
-    background-color: var(--lila);
+    background-color: var(--blanco);
     color: var(--negro);
     text-align: center;
     padding: 20px 0;
     margin-top: 60px;
-    border-top: 2px solid #e3e3e3;
+    border-top: 2px solid #1e1e1e;
 }
 
 @media (max-width: 768px) {
