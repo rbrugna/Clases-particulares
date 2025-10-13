@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded",function() {
+    let turnos = JSON.parse(localStorage.getItem("turnos")) || [];
     const form=document.getElementById('form-turno');
     const tabla=document.getElementById("tabla-turnos");
 
@@ -20,8 +21,16 @@ document.addEventListener("DOMContentLoaded",function() {
             if (t.editando){
                 tabla.innerHTML+=`
                 <tr>
-                    <td>${t.dia}</td>
-                    <td>${t.hora}</td>
+                    <td>
+                        <select id="dia-${i}">
+                            <option value="Lunes" ${t.dia === "Lunes" ? "selected" : ""}>Lunes</option>
+                            <option value="Martes" ${t.dia === "Martes" ? "selected" : ""}>Martes</option>
+                            <option value="Miercoles" ${t.dia === "Miercoles" ? "selected" : ""}>Miercoles</option>
+                            <option value="Jueves" ${t.dia === "Jueves" ? "selected" : ""}>Jueves</option>
+                            <option value="Viernes" ${t.dia === "Viernes" ? "selected" : ""}>Viernes</option>
+                        </select>
+                    </td>
+                    <td><input type="time" id="hora-${i}" value="${t.hora}"></td>
                     <td><input type='text' id="materia-${i}" value="${t.materia||""}"></td>
                     <td><input type='text' id="alumno-${i}" value="${t.alumno||""}"></td>
                     <td>
@@ -79,9 +88,14 @@ document.addEventListener("DOMContentLoaded",function() {
         // Si el boton tiene la clase guardar
         if (boton.classList.contains('guardar')){
             const index=boton.dataset.index;
+
+            const diaInput = document.getElementById(`dia-${index}`).value;
+            const horaInput = document.getElementById(`hora-${index}`).value;
             const materiaInput=document.getElementById(`materia-${index}`).value.trim();
             const alumnoInput=document.getElementById(`alumno-${index}`).value.trim();
 
+            turnos[index].dia = diaInput
+            turnos[index].hora = horaInput
             turnos[index].materia = materiaInput;
             turnos[index].alumno = alumnoInput;
             turnos[index].editando = false;

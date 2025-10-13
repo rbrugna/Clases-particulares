@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function(){
         if (boton.classList.contains("reservar")){
             const index = boton.dataset.index;
             indiceTurno.value=index //guarda indice oculto para despues
-            alert('Completa tu nombre y la materia');
+            form.scrollIntoView({behavior: "smooth", block:"start"});
         }
     });
 
@@ -60,7 +60,6 @@ document.addEventListener("DOMContentLoaded", function(){
         turnos[i].materia=materia;
         guardarEnLocalStorage();
 
-        alert(`Reserva confirmada para ${nombre} en ${materia}.`);
         form.reset();
         mostrarTurnosDisponibles();
     });
