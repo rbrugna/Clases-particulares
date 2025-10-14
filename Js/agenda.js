@@ -3,6 +3,16 @@ document.addEventListener("DOMContentLoaded",function() {
     const form=document.getElementById('form-turno');
     const tabla=document.getElementById("tabla-turnos");
 
+    function mostrarMensaje(texto,tipo="exito"){
+        const mensaje=document.getElementById("mensaje");
+        mensaje.textContent=texto;
+        mensaje.className=`mensaje ${tipo} mostrar`;
+        
+        setTimeout(()=>{
+            mensaje.classList.remove("mostrar");
+        }, 3000);
+    }
+
     function guardarEnLocalStorage(){
         localStorage.setItem("turnos",JSON.stringify(turnos));
     }
@@ -71,6 +81,7 @@ document.addEventListener("DOMContentLoaded",function() {
 
         guardarEnLocalStorage();
         mostrarTurnos();
+        mostrarMensaje("Nuevo horario agregado correctamente");
         form.reset();
     });
 
@@ -102,6 +113,7 @@ document.addEventListener("DOMContentLoaded",function() {
 
             guardarEnLocalStorage();
             mostrarTurnos();
+            mostrarMensaje("Horario actualizado con éxito");
             return;
         }
 
@@ -120,6 +132,7 @@ document.addEventListener("DOMContentLoaded",function() {
                 turnos.splice(index,1);
                 guardarEnLocalStorage(); 
                 mostrarTurnos();
+                mostrarMensaje("Horario eliminado correctamente", "error");
             }
         }
     });

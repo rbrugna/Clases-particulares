@@ -7,6 +7,16 @@ document.addEventListener("DOMContentLoaded", function(){
 
     let turnos= JSON.parse(localStorage.getItem("turnos")) || [];
 
+    function mostrarMensaje(texto,tipo="exito"){
+        const mensaje=document.getElementById("mensaje");
+        mensaje.textContent=texto;
+        mensaje.className=`mensaje ${tipo} mostrar`;
+        
+        setTimeout(()=>{
+            mensaje.classList.remove("mostrar");
+        }, 3000);
+    }
+
     function guardarEnLocalStorage(){
         localStorage.setItem("turnos",JSON.stringify(turnos));
     }
@@ -62,6 +72,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
         form.reset();
         mostrarTurnosDisponibles();
+        mostrarMensaje(`Reserva confirmada para ${nombre} en ${materia}.`);
     });
 
     mostrarTurnosDisponibles();
