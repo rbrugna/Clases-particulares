@@ -174,3 +174,14 @@ main{
     }
 }
 
+.logo {
+    width: 60px;          
+    height: auto;
+    margin-bottom: 10px;  
+    transition: transform 0.3s ease;
+}
+
+.logo:hover {
+    transform: scale(1.05); 
+}
+
