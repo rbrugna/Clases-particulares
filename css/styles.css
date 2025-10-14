@@ -1,3 +1,4 @@
+
 :root {
     --color-principal: #f7c8d0;
     --color-secundario: #ffe8a3;
@@ -18,31 +19,6 @@ body {
     line-height: 1.7;
 }
 
-header {
-    background-color: var(--color-principal);
-    text-align: center;
-    padding: 20px 0;
-    border-bottom: 3px solid #ffd7e0;
-}
-
-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
-
-nav a {
-    color: #222;
-    text-decoration: none;
-    font-weight: 500;
-    margin: 0 15px;
-    transition: color 0.3s ease;
-}
-
-nav a:hover {
-    color: var(--color-boton);
-}
-
 h2, h3 {
     color: #222;
     font-weight: 600;
@@ -52,6 +28,53 @@ h2, h3 {
 p.lead {
     font-size: 1.2rem;
     color: #555;
+}
+
+.site-header {
+    background-color: var(--color-principal);
+    border-bottom: 3px solid #ffd7e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.header-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    gap: 8px;
+}
+
+.logo-img {
+    width: 60px;
+    height: auto;
+    background-color: var(--color-secundario);
+    padding: 8px;
+    border-radius: 16px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+}
+.logo-img:hover {
+    transform: scale(1.05);
+}
+
+.site-header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 6px 0;
+    color: #222;
+}
+
+nav a {
+    color: #222;
+    text-decoration: none;
+    font-weight: 500;
+    margin: 0 12px;
+    transition: color 0.3s ease;
+}
+
+nav a:hover {
+    color: var(--color-boton);
 }
 
 section, article, aside {
@@ -180,17 +203,6 @@ main {
     }
 }
 
-.logo {
-    width: 60px;
-    height: auto;
-    margin-bottom: 10px;
-    transition: transform 0.3s ease;
-}
-
-.logo:hover {
-    transform: scale(1.05);
-}
-
 footer {
     background-color: var(--color-principal);
     color: #333;
@@ -216,31 +228,18 @@ footer {
     table {
         font-size: 0.9rem;
     }
-}
 
-@media (max-width: 576px) {
-    header {
-        padding: 10px 5px;
-    }
-
-    header h1 {
+    .site-header h1 {
         font-size: 1.3rem;
     }
 
-    nav {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
     nav a {
-        display: block;
-        padding: 6px;
-        background-color: var(--color-boton);
-        color: var(--blanco);
-        border-radius: 8px;
+        display: inline-block;
+        margin: 6px;
     }
+}
 
+@media (max-width: 576px) {
     main {
         width: 95%;
         padding: 15px;
@@ -269,87 +268,3 @@ footer {
         font-size: 0.8rem;
     }
 }
-
-.site-header {
-    background-color: var(--color-principal);
-    border-bottom: 3px solid #ffd7e0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.header-row {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 18px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.logo-badge {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    background: var(--color-secundario);
-    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.logo-img {
-    width: 36px;
-    height: 36px;
-    object-fit: contain;
-    transition: transform 0.25s ease;
-}
-.logo-badge:hover .logo-img {
-    transform: scale(1.1);
-}
-
-.brand-block {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-}
-
-.brand-block h1 {
-    font-size: 1.7rem;
-    font-weight: 700;
-    margin: 0;
-    color: #222;
-}
-
-.brand-block nav a {
-    color: #222;
-    text-decoration: none;
-    font-weight: 500;
-    margin-right: 18px;
-    transition: color 0.3s ease;
-}
-
-.brand-block nav a:hover {
-    color: var(--color-boton);
-}
-
-@media (max-width: 768px) {
-    .header-row {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    .brand-block {
-        align-items: center;
-    }
-
-    .brand-block nav a {
-        display: inline-block;
-        margin: 6px;
-    }
-}
-
-
-
