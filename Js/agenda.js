@@ -3,8 +3,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     const tabla = document.getElementById("tabla-turnos");
     const mensaje = document.getElementById("mensaje");
 
-    const BIN_URL = "https://api.jsonbin.io/v3/b/68f01aecae596e708f15fbb5"; 
-    const API_KEY = "68f01aecae596e708f15fbb5"; 
+    const BIN_URL = "https://api.jsonbin.io/v3/b/68f01a6fae596e708f15fb43"; 
+    const API_KEY = "$2a$10$/T.XxMX2A.Je1VsMGPe/0eAPVYhZMxoBFq3uITc43uPFDkEF8aNm6"; 
     let turnos = [];
 
     async function cargarTurnos() {
