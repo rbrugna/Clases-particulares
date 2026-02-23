@@ -143,6 +143,25 @@ table {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+/* Calendar grid buttons */
+.btn-light {
+    border-radius: 8px;
+    margin: 2px;
+    padding: 6px 0;
+}
+
+.btn-primary {
+    border-radius: 8px;
+    margin: 2px;
+}
+
+.calendar-container { max-width: 360px; }
+
+/* Chat styles */
+.chat-left { width: 220px; }
+.chat-right { flex:1; }
+.chat-bubble { padding: 10px 12px; border-radius: 12px; display: inline-block; }
+
 th {
     background-color: var(--color-secundario);
     color: #333;

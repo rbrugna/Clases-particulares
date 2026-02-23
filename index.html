@@ -20,10 +20,8 @@
     <div class="header-wrap">
         <img src="img/logo.png" alt="Logo de Clases" class="logo-img">
         <h1>Profesora Cynthia</h1>
-        <nav>
-        <a href="index.html">Inicio</a>
-        <a href="agenda.html">Agenda del profesor</a>
-        <a href="reservar.html">Reservar clase</a>
+        <nav id="mainNav">
+        <!-- nav adjusted by JS based on role -->
         </nav>
     </div>
     </header>
@@ -79,6 +77,14 @@
                             <button id="asProfesora" class="btn btn-outline-primary">Profesora</button>
                         </div>
 
+                        <div id="alumnoWrap" style="display:none;">
+                          <label for="alumnoUser">Usuario (nombre):</label>
+                          <input id="alumnoUser" type="text" class="form-control" placeholder="Tu nombre de alumno">
+                          <div class="text-end mt-2">
+                            <button id="btnLoginAlumno" class="btn btn-primary">Entrar como alumno</button>
+                          </div>
+                        </div>
+
                         <div id="pwdWrap" style="display:none;">
                             <label for="pwd">Contraseña de profesora:</label>
                             <input id="pwd" type="password" class="form-control" placeholder="Ingrese contraseña">
@@ -94,43 +100,18 @@
             </div>
         </div>
 
+        <script type="module" src="Js/firebase-auth.js"></script>
         <script>
-        document.addEventListener('DOMContentLoaded', function () {
-                const roleModalEl = document.getElementById('roleModal');
-                const roleModal = new bootstrap.Modal(roleModalEl, {backdrop: 'static', keyboard: false});
-                const asAlumno = document.getElementById('asAlumno');
-                const asProfesora = document.getElementById('asProfesora');
-                const pwdWrap = document.getElementById('pwdWrap');
-                const pwd = document.getElementById('pwd');
-                const btnLoginProf = document.getElementById('btnLoginProf');
-
-                // show modal on entry
-                roleModal.show();
-
-                asAlumno.addEventListener('click', function () {
-                        localStorage.setItem('role', 'alumno');
-                        roleModal.hide();
-                        window.location.href = 'reservar.html';
-                });
-
-                asProfesora.addEventListener('click', function () {
-                        pwdWrap.style.display = 'block';
-                        pwd.focus();
-                });
-
-                // Simple client-side password check (change value as needed)
-                const PROF_PASSWORD = 'cynthia2025';
-
-                btnLoginProf.addEventListener('click', function () {
-                        if (pwd.value === PROF_PASSWORD) {
-                                localStorage.setItem('role', 'profesora');
-                                roleModal.hide();
-                                window.location.href = 'agenda.html';
-                        } else {
-                                alert('Contraseña incorrecta');
-                        }
-                });
-        });
+          // update nav on index (kept simple; auth module will sync localStorage)
+          (function(){
+            const nav = document.getElementById('mainNav');
+            const roleNow = localStorage.getItem('role');
+            const user = localStorage.getItem('username');
+            if (roleNow==='alumno') nav.innerHTML = `<a href="index.html">Inicio</a> <a href="reservar.html">Reservar</a> <a href="chat.html">Mensajes</a> <a href="#" id="logout">Cerrar sesión (${user||'Alumno'})</a>`;
+            else if (roleNow==='profesora') nav.innerHTML = `<a href="index.html">Inicio</a> <a href="agenda.html">Agenda del profesor</a> <a href="chat.html">Mensajes</a> <a href="#" id="logout">Cerrar sesión</a>`;
+            else nav.innerHTML = `<a href="index.html">Inicio</a> <a href="agenda.html">Agenda del profesor</a> <a href="reservar.html">Reservar clase</a>`;
+            const logout = document.getElementById('logout'); if (logout) logout.addEventListener('click', ()=>{ localStorage.removeItem('role'); localStorage.removeItem('username'); window.location.href='index.html'; });
+          })();
         </script>
 </body>
 </html>

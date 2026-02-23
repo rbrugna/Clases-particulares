@@ -20,17 +20,25 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
     const data = await res.json();
     turnos = data.record.turnos || [];
+    // messages may exist
+    window.__messages = data.record.messages || [];
     mostrarTurnos();
+    // render professor calendar after loading
+    try { renderProfessorCalendar(); } catch(e){ /* ignore if UI missing */ }
     }
 
-    async function guardarTurnos() {
+    async function saveRecord() {
+    const current = await (await fetch(BIN_URL, { headers: { "X-Master-Key": API_KEY } })).json();
+    const record = current.record || {};
+    record.turnos = turnos;
+    record.messages = window.__messages || [];
     await fetch(BIN_URL, {
         method: "PUT",
         headers: {
         "Content-Type": "application/json",
         "X-Master-Key": API_KEY
         },
-        body: JSON.stringify({ turnos })
+        body: JSON.stringify(record)
     });
     }
 
@@ -46,6 +54,83 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (turnos.length === 0) {
         tabla.innerHTML = "<tr><td colspan='5'>No hay horarios cargados.</td></tr>";
         return;
+    }
+
+    // Professor calendar rendering
+    function nameFromNumber(n) {
+        const arr = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+        return arr[n];
+    }
+
+    function renderProfessorCalendar() {
+        const calendarEl = document.getElementById('calendarProf');
+        const prev = document.getElementById('prevMonthProf');
+        const next = document.getElementById('nextMonthProf');
+        const mesAnio = document.getElementById('mesAnioProf');
+        const timesWrap = document.getElementById('timesWrapProf');
+        const timesList = document.getElementById('timesListProf');
+        const fechaProfText = document.getElementById('fechaProfText');
+        const nuevaHora = document.getElementById('nuevaHoraProf');
+        const addBtn = document.getElementById('addTimeProf');
+
+        if (!calendarEl) return;
+
+        let offset = 0;
+
+        function render() {
+            const today = new Date();
+            const first = new Date(today.getFullYear(), today.getMonth()+offset, 1);
+            mesAnio.textContent = `${first.toLocaleString('es-ES',{month:'long'})} ${first.getFullYear()}`;
+            calendarEl.innerHTML = '';
+            const header = document.createElement('div'); header.className='d-flex gap-2 mb-2';
+            ['D','L','M','M','J','V','S'].forEach(ch=>{ const h=document.createElement('div'); h.style.width='40px'; h.style.textAlign='center'; h.textContent=ch; header.appendChild(h); });
+            calendarEl.appendChild(header);
+
+            const startDay = first.getDay();
+            const daysInMonth = new Date(first.getFullYear(), first.getMonth()+1, 0).getDate();
+            const grid = document.createElement('div'); grid.className='d-flex flex-wrap';
+            for (let i=0;i<startDay;i++){ const e=document.createElement('div'); e.style.width='40px'; e.style.height='40px'; grid.appendChild(e); }
+            for (let d=1; d<=daysInMonth; d++){
+                const cell = document.createElement('button'); cell.className='btn btn-light'; cell.style.width='40px'; cell.style.height='40px';
+                const dateObj = new Date(first.getFullYear(), first.getMonth(), d);
+                const weekday = nameFromNumber(dateObj.getDay());
+                // find turnos for that date (by exact fecha) or by weekday availability
+                const byDate = turnos.filter(t => t.fecha && (new Date(t.fecha)).toDateString() === dateObj.toDateString());
+                const byWeekday = turnos.filter(t => !t.fecha && t.dia === weekday);
+                if (byDate.length>0) { cell.classList.add('btn-success'); cell.style.color='white'; }
+                else if (byWeekday.length>0) { cell.classList.add('btn-primary'); cell.style.color='white'; }
+                cell.textContent = d;
+                cell.addEventListener('click', ()=>{
+                    fechaProfText.textContent = `${weekday} ${d}/${first.getMonth()+1}/${first.getFullYear()}`;
+                    timesList.innerHTML='';
+                    // list byDate and byWeekday
+                    const all = byDate.concat(byWeekday.map((t,idx)=> ({...t, idx: turnos.indexOf(t)})));
+                    all.forEach(t=>{
+                        const el = document.createElement('div');
+                        el.textContent = `${t.hora} — ${t.alumno || 'Libre'}`;
+                        timesList.appendChild(el);
+                    });
+                    timesWrap.style.display='block';
+                    // attach add button
+                    addBtn.onclick = async ()=>{
+                        const hora = nuevaHora.value;
+                        if(!hora) return alert('Elegí una hora');
+                        const newTurno = { dia: weekday, hora, materia:null, alumno:null, editando:false, fecha: new Date(first.getFullYear(), first.getMonth(), d).toISOString() };
+                        turnos.push(newTurno);
+                        await saveRecord();
+                        render();
+                        mostrarTurnos();
+                        mostrarMensaje('Hora agregada para la fecha');
+                    };
+                });
+                grid.appendChild(cell);
+            }
+            calendarEl.appendChild(grid);
+        }
+
+        prev.addEventListener('click', ()=>{ offset--; render(); });
+        next.addEventListener('click', ()=>{ offset++; render(); });
+        render();
     }
 
     for (let i = 0; i < turnos.length; i++) {
@@ -103,7 +188,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         editando: false
     });
 
-    await guardarTurnos();
+    await saveRecord();
     mostrarTurnos();
     mostrarMensaje("Nuevo horario agregado correctamente");
     form.reset();
@@ -125,7 +210,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         turnos[index].alumno = document.getElementById(`alumno-${index}`).value.trim();
         turnos[index].editando = false;
 
-        await guardarTurnos();
+        await saveRecord();
         mostrarTurnos();
         mostrarMensaje("Horario actualizado con éxito");
     }
@@ -138,7 +223,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (boton.classList.contains("eliminar")) {
         if (confirm("¿Seguro que quieres eliminar este horario?")) {
         turnos.splice(index, 1);
-        await guardarTurnos();
+        await saveRecord();
         mostrarTurnos();
         mostrarMensaje("Horario eliminado correctamente", "error");
         }

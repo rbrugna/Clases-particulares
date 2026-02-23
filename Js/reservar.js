@@ -55,25 +55,39 @@ document.addEventListener("DOMContentLoaded", async function () {
         setTimeout(() => mensaje.classList.remove("mostrar"), 3000);
     }
 
+    let messages = [];
+
     async function cargarTurnos() {
         const res = await fetch(BIN_URL, {
             headers: { "X-Master-Key": API_KEY },
         });
         const data = await res.json();
         turnos = data.record.turnos || [];
+        messages = data.record.messages || [];
+        // prefill student name if available
+        const storedUser = localStorage.getItem('username');
+        if (storedUser) {
+            const nombreInput = document.getElementById('nombreAlumno');
+            if (nombreInput) nombreInput.value = storedUser;
+        }
         mostrarTurnosDisponibles();
         }
 
-    async function guardarTurnos() {
-        await fetch(BIN_URL.replace("/latest", ""), { // sacamos /latest para escribir
-            method: "PUT",
+    async function saveRecord() {
+        // fetch current to preserve unknown keys
+        const current = await (await fetch(BIN_URL, { headers: { "X-Master-Key": API_KEY } })).json();
+        const record = current.record || {};
+        record.turnos = turnos;
+        record.messages = messages;
+        await fetch(BIN_URL.replace('/latest',''), {
+            method: 'PUT',
             headers: {
-                "Content-Type": "application/json",
-                "X-Master-Key": API_KEY,
+                'Content-Type': 'application/json',
+                'X-Master-Key': API_KEY
             },
-            body: JSON.stringify({ turnos }),
+            body: JSON.stringify(record)
         });
-        }
+    }
 
     function mostrarTurnosDisponibles() {
         // Hide legacy table and render calendar UI instead
@@ -208,7 +222,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         event.preventDefault();
 
         const i = indiceTurno.value;
-        const nombre = nombreAlumno.value.trim();
+        const storedUser = localStorage.getItem('username');
+        const nombre = (storedUser && storedUser.trim()) ? storedUser.trim() : nombreAlumno.value.trim();
         const materia = materiaAlumno.value.trim();
 
         if (i === "") {
@@ -227,7 +242,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             turnos[i].diaNumero = null;
         }
 
-        await guardarTurnos();
+        await saveRecord();
         form.reset();
         mostrarTurnosDisponibles();
         mostrarMensaje(`Reserva confirmada para ${nombre} en ${materia}.`);

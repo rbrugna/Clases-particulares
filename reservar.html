@@ -20,10 +20,8 @@
     <div class="header-wrap">
         <img src="img/logo.png" alt="Logo de Clases" class="logo-img">
         <h1>Profesora Cynthia</h1>
-        <nav>
-        <a href="index.html">Inicio</a>
-        <a href="agenda.html">Agenda del profesor</a>
-        <a href="reservar.html">Reservar clase</a>
+        <nav id="mainNav">
+        <!-- nav adjusted by JS based on role -->
         </nav>
     </div>
     </header>
@@ -89,6 +87,21 @@
 
     <script src="Js/reservar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+        (function(){
+            const nav = document.getElementById('mainNav');
+            const role = localStorage.getItem('role');
+            const user = localStorage.getItem('username');
+            if (!nav) return;
+            if (role === 'alumno') {
+                nav.innerHTML = `<a href="index.html">Inicio</a> <a href="reservar.html">Reservar</a> <a href="chat.html">Mensajes</a> <a href="#" id="logout">Cerrar sesión (${user||'Alumno'})</a>`;
+            } else {
+                nav.innerHTML = `<a href="index.html">Inicio</a> <a href="agenda.html">Agenda del profesor</a> <a href="chat.html">Mensajes</a> <a href="#" id="logout">Cerrar sesión</a>`;
+            }
+            const logout = document.getElementById('logout');
+            if (logout) logout.addEventListener('click', ()=>{ localStorage.removeItem('role'); localStorage.removeItem('username'); window.location.href='index.html'; });
+        })();
+        </script>
 </body>
 </html>
 
