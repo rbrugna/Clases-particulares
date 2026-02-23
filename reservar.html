@@ -30,20 +30,22 @@
 
     <main class="container my-5">
     <section class="mb-5">
-        <h2 class="text-center mb-4">Horarios disponibles</h2>
+        <h2 class="text-center mb-4">Elige fecha en el calendario</h2>
 
-        <div class="table-responsive">
-        <table class="table align-middle" id="tabla-reservas">
-            <thead>
-            <tr>
-                <th>Día</th>
-                <th>Hora</th>
-                <th>Reservar</th>
-            </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+        <div>
+            <button id="prevMonth" class="btn btn-sm">«</button>
+            <span id="mesAnio" class="mx-2"></span>
+            <button id="nextMonth" class="btn btn-sm">»</button>
+        </div>
+        <div><small>Los días en azul tienen turnos disponibles</small></div>
+        </div>
+
+        <div id="calendar" class="mb-3"></div>
+
+        <div id="timesWrap" style="display:none;">
+        <h3 class="mb-2">Horarios disponibles para <span id="fechaSeleccionadaText"></span></h3>
+        <div id="timesList" class="d-flex flex-column gap-2"></div>
         </div>
     </section>
 

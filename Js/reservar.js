@@ -76,45 +76,133 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
 
     function mostrarTurnosDisponibles() {
-        tabla.innerHTML = "";
+        // Hide legacy table and render calendar UI instead
+        if (tabla) tabla.style.display = 'none';
+        // calendar elements
+        const calendarEl = document.getElementById('calendar');
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+        const mesAnio = document.getElementById('mesAnio');
+        const timesWrap = document.getElementById('timesWrap');
+        const timesList = document.getElementById('timesList');
+        const fechaSeleccionadaText = document.getElementById('fechaSeleccionadaText');
 
-        const libres = turnos.filter((t) => !t.alumno);
+        let currentMonthOffset = 0;
 
-        if (libres.length === 0) {
-            tabla.innerHTML = '<tr><td colspan="3">No hay horarios disponibles.</td></tr>';
-            return;
+        function nameFromNumber(n) {
+            const arr = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+            return arr[n];
         }
 
-        for (let i = 0; i < libres.length; i++) {
-            const t = libres[i];
-            const indexReal = turnos.indexOf(t);
-            const fila = `
-                <tr>
-                    <td>${t.dia}</td>
-                    <td>${t.hora}</td>
-                    <td><button class="reservar" data-index="${indexReal}">Reservar</button></td>
-                </tr>`;
-            tabla.innerHTML += fila;
+        function renderCalendar() {
+            const today = new Date();
+            const firstOfMonth = new Date(today.getFullYear(), today.getMonth() + currentMonthOffset, 1);
+            const year = firstOfMonth.getFullYear();
+            const month = firstOfMonth.getMonth();
+
+            mesAnio.textContent = `${firstOfMonth.toLocaleString('es-ES', { month: 'long' })} ${year}`;
+
+            calendarEl.innerHTML = '';
+            const weekDays = ['D','L','M','M','J','V','S'];
+            const header = document.createElement('div');
+            header.className = 'd-flex gap-2 mb-2';
+            for (let wd of weekDays) {
+                const h = document.createElement('div');
+                h.style.width = '40px';
+                h.style.textAlign = 'center';
+                h.textContent = wd;
+                header.appendChild(h);
+            }
+            calendarEl.appendChild(header);
+
+            const startDay = firstOfMonth.getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            const grid = document.createElement('div');
+            grid.className = 'd-flex flex-wrap';
+
+            for (let i = 0; i < startDay; i++) {
+                const empty = document.createElement('div');
+                empty.style.width = '40px';
+                empty.style.height = '40px';
+                grid.appendChild(empty);
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const cell = document.createElement('button');
+                cell.className = 'btn btn-light';
+                cell.style.width = '40px';
+                cell.style.height = '40px';
+                const dateObj = new Date(year, month, d);
+                const weekdayName = nameFromNumber(dateObj.getDay());
+
+                const disponibles = turnos.filter(t => !t.alumno && t.dia === weekdayName);
+                if (disponibles.length > 0) {
+                    cell.classList.add('btn-primary');
+                    cell.classList.remove('btn-light');
+                    cell.style.color = 'white';
+                }
+
+                cell.textContent = d;
+                cell.dataset.iso = dateObj.toISOString();
+                cell.dataset.weekday = weekdayName;
+
+                cell.addEventListener('click', function () {
+                    selectDate(dateObj);
+                });
+
+                grid.appendChild(cell);
+            }
+
+            calendarEl.appendChild(grid);
         }
+
+        function selectDate(dateObj) {
+            fechaReserva.value = dateObj.toISOString();
+            const weekdayName = nameFromNumber(dateObj.getDay());
+            fechaSeleccionadaText.textContent = `${weekdayName} ${dateObj.getDate()}/${dateObj.getMonth()+1}/${dateObj.getFullYear()}`;
+
+            const disponibles = turnos
+                .map((t, idx) => ({...t, idx}))
+                .filter(t => !t.alumno && t.dia === weekdayName);
+
+            timesList.innerHTML = '';
+            if (disponibles.length === 0) {
+                timesList.innerHTML = '<div>No hay horarios disponibles para esa fecha.</div>';
+                timesWrap.style.display = 'block';
+                return;
+            }
+
+            disponibles.forEach(d => {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-outline-primary';
+                btn.textContent = d.hora;
+                btn.dataset.index = d.idx;
+                btn.addEventListener('click', function () {
+                    indiceTurno.value = d.idx;
+                    horaSeleccionada.value = d.hora;
+                    seleccion.textContent = `${d.dia} ${dateObj.getDate()}/${dateObj.getMonth()+1}/${dateObj.getFullYear()} - ${d.hora}`;
+                    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+                timesList.appendChild(btn);
+            });
+
+            timesWrap.style.display = 'block';
+        }
+
+        prevMonthBtn.addEventListener('click', function () {
+            currentMonthOffset -= 1;
+            renderCalendar();
+        });
+        nextMonthBtn.addEventListener('click', function () {
+            currentMonthOffset += 1;
+            renderCalendar();
+        });
+
+        // initial render
+        renderCalendar();
     }
-
-    tabla.addEventListener("click", function (event) {
-        const boton = event.target;
-        if (boton.classList.contains("reservar")) {
-            const index = boton.dataset.index;
-            indiceTurno.value = index; // guarda el índice para después
-
-            // calcular la próxima fecha para el día de la semana correspondiente
-            const turno = turnos[index];
-            const fecha = nextDateForWeekday(turno.dia);
-            fechaReserva.value = fecha.toISOString();
-            horaSeleccionada.value = turno.hora;
-            diaSeleccionado.value = turno.dia;
-            seleccion.textContent = `${turno.dia} ${fecha.getDate()}/${fecha.getMonth()+1}/${fecha.getFullYear()} - ${turno.hora}`;
-
-            form.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-    });
+    // legacy table click handler removed; calendar handles selection now
 
     form.addEventListener("submit", async function (event) {
         event.preventDefault();
