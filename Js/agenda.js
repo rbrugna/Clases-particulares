@@ -88,17 +88,21 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             const startDay = first.getDay();
             const daysInMonth = new Date(first.getFullYear(), first.getMonth()+1, 0).getDate();
-            const grid = document.createElement('div'); grid.className='d-flex flex-wrap';
-            for (let i=0;i<startDay;i++){ const e=document.createElement('div'); e.style.width='40px'; e.style.height='40px'; grid.appendChild(e); }
+            const grid = document.createElement('div'); grid.className='calendar-grid';
+            // insert empty cells for alignment
+            for (let i=0;i<startDay;i++){ const e=document.createElement('div'); e.className='calendar-cell'; e.style.visibility='hidden'; grid.appendChild(e); }
             for (let d=1; d<=daysInMonth; d++){
-                const cell = document.createElement('button'); cell.className='btn btn-light'; cell.style.width='40px'; cell.style.height='40px';
+                const cell = document.createElement('div'); cell.className='calendar-cell';
                 const dateObj = new Date(first.getFullYear(), first.getMonth(), d);
                 const weekday = nameFromNumber(dateObj.getDay());
                 // find turnos for that date (by exact fecha) or by weekday availability
                 const byDate = turnos.filter(t => t.fecha && (new Date(t.fecha)).toDateString() === dateObj.toDateString());
                 const byWeekday = turnos.filter(t => !t.fecha && t.dia === weekday);
-                if (byDate.length>0) { cell.classList.add('btn-success'); cell.style.color='white'; }
-                else if (byWeekday.length>0) { cell.classList.add('btn-primary'); cell.style.color='white'; }
+                if (byDate.length>0) { cell.classList.add('has-available'); }
+                else if (byWeekday.length>0) { cell.classList.add('has-available'); }
+                // mark today
+                const today = new Date(); if (dateObj.toDateString() === today.toDateString()) cell.classList.add('today');
+
                 cell.textContent = d;
                 cell.addEventListener('click', ()=>{
                     fechaProfText.textContent = `${weekday} ${d}/${first.getMonth()+1}/${first.getFullYear()}`;

@@ -18,6 +18,13 @@ body {
     line-height: 1.7;
 }
 
+/* modern card-like layout */
+.header-wrap { border-radius: 18px; padding: 28px; }
+
+.site-header { padding-bottom: 10px; }
+
+.container { max-width: 1100px; }
+
 h2, h3 {
     color: #222;
     font-weight: 600;
@@ -151,11 +158,41 @@ table {
 }
 
 .btn-primary {
-    border-radius: 8px;
+    border-radius: 12px;
     margin: 2px;
 }
 
-.calendar-container { max-width: 360px; }
+.calendar-container { max-width: 720px; }
+
+/* Monthly calendar grid */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    justify-items: center;
+}
+.calendar-cell {
+    width: 48px;
+    height: 48px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius: 10px;
+    background: var(--blanco);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    cursor: pointer;
+}
+.calendar-cell:hover { transform: translateY(-4px); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+.calendar-cell.today { border: 2px solid var(--color-boton); }
+.calendar-cell.has-available { background: var(--color-boton); color: white; }
+
+.month-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+
+/* chat layout tweaks */
+.chat-left { width: 240px; }
+.chat-right { flex:1; }
+.chat-bubble { padding: 10px 12px; border-radius: 12px; display: inline-block; max-width: 85%; }
 
 /* Chat styles */
 .chat-left { width: 220px; }

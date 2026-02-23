@@ -24,19 +24,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnLoginAlumno.addEventListener('click', async () => {
     const name = alumnoUser.value.trim();
+    const emailEl = document.getElementById('alumnoEmail');
+    const pwdEl = document.getElementById('alumnoPwd');
+    const email = emailEl ? emailEl.value.trim() : '';
+    const password = pwdEl ? pwdEl.value : '';
     if (!name) return alert('Ingresá tu nombre (se usará como usuario)');
-
-    // ask for email+password via prompt (simple flow)
-    const email = prompt('Ingresá tu email (se usará para crear cuenta):');
-    if (!email) return;
-    const password = prompt('Elegí una contraseña segura:');
-    if (!password) return;
+    if (!email) return alert('Ingresá tu email');
+    if (!password) return alert('Ingresá una contraseña');
 
     try {
       // Try sign in first
       await signInWithEmailAndPassword(auth, email, password);
+      // If sign-in succeeds but no displayName, set it
+      if (auth.currentUser && !auth.currentUser.displayName) {
+        await updateProfile(auth.currentUser, { displayName: name });
+      }
     } catch (err) {
-      // if user not found, create new
+      // if user not found or sign-in fails, try create new
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(cred.user, { displayName: name });
