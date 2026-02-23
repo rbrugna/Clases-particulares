@@ -32,10 +32,12 @@
         <h2 class="text-center mb-4">Elige fecha en el calendario</h2>
 
         <div class="d-flex justify-content-between align-items-center mb-2">
-        <div>
+        <div class="d-flex align-items-center gap-2">
             <button id="prevMonth" class="btn btn-sm">«</button>
-            <span id="mesAnio" class="mx-2"></span>
+            <select id="monthSelect" class="form-select form-select-sm" style="width:140px;"></select>
+            <select id="yearSelect" class="form-select form-select-sm" style="width:100px;"></select>
             <button id="nextMonth" class="btn btn-sm">»</button>
+            <span id="mesAnio" class="mx-2 visually-hidden"></span>
         </div>
         <div><small>Los días en azul tienen turnos disponibles</small></div>
         </div>

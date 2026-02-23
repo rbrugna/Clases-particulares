@@ -66,6 +66,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         const calendarEl = document.getElementById('calendarProf');
         const prev = document.getElementById('prevMonthProf');
         const next = document.getElementById('nextMonthProf');
+        const monthSelect = document.getElementById('monthSelectProf');
+        const yearSelect = document.getElementById('yearSelectProf');
         const mesAnio = document.getElementById('mesAnioProf');
         const timesWrap = document.getElementById('timesWrapProf');
         const timesList = document.getElementById('timesListProf');
@@ -75,11 +77,23 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         if (!calendarEl) return;
 
-        let offset = 0;
+        const today = new Date();
+        let displayedMonth = today.getMonth();
+        let displayedYear = today.getFullYear();
+
+        // populate selectors
+        const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+        monthSelect.innerHTML = '';
+        monthNames.forEach((m,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=m; monthSelect.appendChild(o); });
+        monthSelect.value = displayedMonth;
+
+        yearSelect.innerHTML = '';
+        const startYear = displayedYear - 5;
+        for (let y = startYear; y <= displayedYear + 2; y++) { const o=document.createElement('option'); o.value=y; o.textContent=y; yearSelect.appendChild(o); }
+        yearSelect.value = displayedYear;
 
         function render() {
-            const today = new Date();
-            const first = new Date(today.getFullYear(), today.getMonth()+offset, 1);
+            const first = new Date(displayedYear, displayedMonth, 1);
             mesAnio.textContent = `${first.toLocaleString('es-ES',{month:'long'})} ${first.getFullYear()}`;
             calendarEl.innerHTML = '';
             const header = document.createElement('div'); header.className='d-flex gap-2 mb-2';
@@ -89,33 +103,23 @@ document.addEventListener("DOMContentLoaded", async function () {
             const startDay = first.getDay();
             const daysInMonth = new Date(first.getFullYear(), first.getMonth()+1, 0).getDate();
             const grid = document.createElement('div'); grid.className='calendar-grid';
-            // insert empty cells for alignment
             for (let i=0;i<startDay;i++){ const e=document.createElement('div'); e.className='calendar-cell'; e.style.visibility='hidden'; grid.appendChild(e); }
             for (let d=1; d<=daysInMonth; d++){
                 const cell = document.createElement('div'); cell.className='calendar-cell';
                 const dateObj = new Date(first.getFullYear(), first.getMonth(), d);
                 const weekday = nameFromNumber(dateObj.getDay());
-                // find turnos for that date (by exact fecha) or by weekday availability
                 const byDate = turnos.filter(t => t.fecha && (new Date(t.fecha)).toDateString() === dateObj.toDateString());
                 const byWeekday = turnos.filter(t => !t.fecha && t.dia === weekday);
-                if (byDate.length>0) { cell.classList.add('has-available'); }
-                else if (byWeekday.length>0) { cell.classList.add('has-available'); }
-                // mark today
-                const today = new Date(); if (dateObj.toDateString() === today.toDateString()) cell.classList.add('today');
+                if (byDate.length>0 || byWeekday.length>0) { cell.classList.add('has-available'); }
+                const now = new Date(); if (dateObj.toDateString() === now.toDateString()) cell.classList.add('today');
 
                 cell.textContent = d;
                 cell.addEventListener('click', ()=>{
                     fechaProfText.textContent = `${weekday} ${d}/${first.getMonth()+1}/${first.getFullYear()}`;
                     timesList.innerHTML='';
-                    // list byDate and byWeekday
                     const all = byDate.concat(byWeekday.map((t,idx)=> ({...t, idx: turnos.indexOf(t)})));
-                    all.forEach(t=>{
-                        const el = document.createElement('div');
-                        el.textContent = `${t.hora} — ${t.alumno || 'Libre'}`;
-                        timesList.appendChild(el);
-                    });
+                    all.forEach(t=>{ const el=document.createElement('div'); el.textContent = `${t.hora} — ${t.alumno || 'Libre'}`; timesList.appendChild(el); });
                     timesWrap.style.display='block';
-                    // attach add button
                     addBtn.onclick = async ()=>{
                         const hora = nuevaHora.value;
                         if(!hora) return alert('Elegí una hora');
@@ -132,8 +136,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             calendarEl.appendChild(grid);
         }
 
-        prev.addEventListener('click', ()=>{ offset--; render(); });
-        next.addEventListener('click', ()=>{ offset++; render(); });
+        prev.addEventListener('click', ()=>{ if (displayedMonth===0){ displayedMonth=11; displayedYear--; } else displayedMonth--; monthSelect.value=displayedMonth; yearSelect.value=displayedYear; render(); });
+        next.addEventListener('click', ()=>{ if (displayedMonth===11){ displayedMonth=0; displayedYear++; } else displayedMonth++; monthSelect.value=displayedMonth; yearSelect.value=displayedYear; render(); });
+        monthSelect.addEventListener('change', (e)=>{ displayedMonth = parseInt(e.target.value,10); render(); });
+        yearSelect.addEventListener('change', (e)=>{ displayedYear = parseInt(e.target.value,10); render(); });
         render();
     }
 

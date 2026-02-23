@@ -35,10 +35,12 @@
                 <h2 class="text-center mb-4">Calendario y disponibilidad</h2>
 
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                <div>
-                        <button id="prevMonthProf" class="btn btn-sm">«</button>
-                        <span id="mesAnioProf" class="mx-2"></span>
-                        <button id="nextMonthProf" class="btn btn-sm">»</button>
+                <div class="d-flex align-items-center gap-2">
+                    <button id="prevMonthProf" class="btn btn-sm">«</button>
+                    <select id="monthSelectProf" class="form-select form-select-sm" style="width:140px;"></select>
+                    <select id="yearSelectProf" class="form-select form-select-sm" style="width:100px;"></select>
+                    <button id="nextMonthProf" class="btn btn-sm">»</button>
+                    <span id="mesAnioProf" class="mx-2 visually-hidden"></span>
                 </div>
                 <div><small>Click en un día para ver/añadir horarios</small></div>
                 </div>
