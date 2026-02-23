@@ -35,8 +35,8 @@
         <p class="lead">Elegí materia, fecha y hora. Todo desde la web.</p>
 
         <div class="d-flex flex-column flex-md-row justify-content-center gap-3 mt-4">
-        <a href="reservar.html" class="btn">Quiero reservar</a>
-        <a href="agenda.html" class="btn">Soy la profesora</a>
+        <a href="#" class="btn" id="btn-alumno">Quiero reservar</a>
+        <a href="#" class="btn" id="btn-profesora">Soy la profesora</a>
         </div>
     </section>
 
@@ -65,5 +65,23 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const btnAlumno = document.getElementById('btn-alumno');
+        const btnProfesora = document.getElementById('btn-profesora');
+
+        btnAlumno.addEventListener('click', function (e) {
+        e.preventDefault();
+        localStorage.setItem('role', 'alumno');
+        window.location.href = 'reservar.html';
+        });
+
+        btnProfesora.addEventListener('click', function (e) {
+        e.preventDefault();
+        localStorage.setItem('role', 'profesora');
+        window.location.href = 'agenda.html';
+        });
+    });
+    </script>
 </body>
 </html>

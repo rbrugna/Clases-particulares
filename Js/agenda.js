@@ -1,4 +1,11 @@
 document.addEventListener("DOMContentLoaded", async function () {
+    // role protection: only allow profesora here
+    const role = localStorage.getItem('role');
+    if (role !== 'profesora') {
+        alert('Acceso restringido: esta página es para la profesora.');
+        window.location.href = 'index.html';
+        return;
+    }
     const form = document.getElementById("form-turno");
     const tabla = document.getElementById("tabla-turnos");
     const mensaje = document.getElementById("mensaje");
@@ -65,10 +72,12 @@ document.addEventListener("DOMContentLoaded", async function () {
             </td>
             </tr>`;
         } else {
+        const fechaMostrar = t.fecha ? (() => { const d=new Date(t.fecha); return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}` })() : '-';
         tabla.innerHTML += `
             <tr>
             <td>${t.dia}</td>
             <td>${t.hora}</td>
+            <td>${fechaMostrar}</td>
             <td>${t.materia || "-"}</td>
             <td>${t.alumno || "-"}</td>
             <td>
