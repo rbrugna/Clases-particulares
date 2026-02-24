@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         window.location.href = 'index.html';
         return;
     }
+    const form = document.getElementById("form-turno");
     const tabla = document.getElementById("tabla-turnos");
     const mensaje = document.getElementById("mensaje");
 
@@ -231,16 +232,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             addBtn.onclick = async ()=>{
                 const hora = nuevaHora.value;
                 if(!hora) return alert('Elegí una hora');
-                const nombre = (document.getElementById('alumnoProf') || {value: ''}).value.trim() || null;
-                const materia = (document.getElementById('materiaProf') || {value: ''}).value.trim() || null;
                 const weekday = nameFromNumber(dateObj.getDay());
-                const newTurno = { dia: weekday, hora, materia: materia, alumno: nombre, editando:false, fecha: dateObj.toISOString(), weekNumber: getISOWeekNumber(dateObj) };
+                const newTurno = { dia: weekday, hora, materia:null, alumno:null, editando:false, fecha: dateObj.toISOString(), weekNumber: getISOWeekNumber(dateObj) };
                 turnos.push(newTurno);
                 await saveRecord();
-                // clear inputs
-                nuevaHora.value = '';
-                if (document.getElementById('alumnoProf')) document.getElementById('alumnoProf').value = '';
-                if (document.getElementById('materiaProf')) document.getElementById('materiaProf').value = '';
                 renderCalendar();
                 mostrarTurnos();
                 mostrarMensaje('Hora agregada para la fecha');
@@ -251,7 +246,25 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
     
 
-    // weekly add-form removed: use calendar controls to add times
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const dia = document.getElementById("dia").value;
+        const hora = document.getElementById("hora").value;
+
+        turnos.push({
+            dia,
+            hora,
+            materia: null,
+            alumno: null,
+            editando: false
+        });
+
+        await saveRecord();
+        mostrarTurnos();
+        mostrarMensaje("Nuevo horario agregado correctamente");
+        form.reset();
+    });
 
     tabla.addEventListener("click", async (event) => {
         const boton = event.target;

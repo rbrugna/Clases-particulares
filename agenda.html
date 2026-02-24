@@ -50,22 +50,38 @@
                 <div id="timesWrapProf" style="display:none;">
                     <h3 class="mb-2">Horarios para <span id="fechaProfText"></span></h3>
                     <div id="timesListProf" class="d-flex flex-column gap-2 mb-3"></div>
-                    <div class="row g-2 mb-2">
-                        <div class="col-auto">
-                            <input id="nuevaHoraProf" type="time" class="form-control" style="max-width:160px;" placeholder="Hora">
-                        </div>
-                        <div class="col-md-4">
-                            <input id="alumnoProf" type="text" class="form-control" placeholder="Nombre alumno (opcional)">
-                        </div>
-                        <div class="col-md-4">
-                            <input id="materiaProf" type="text" class="form-control" placeholder="Materia (opcional)">
-                        </div>
-                        <div class="col-auto">
-                            <button id="addTimeProf" class="btn btn-primary">Agregar hora para esta fecha</button>
-                        </div>
+                    <div class="d-flex gap-2">
+                        <input id="nuevaHoraProf" type="time" class="form-control" style="max-width:160px;">
+                        <button id="addTimeProf" class="btn btn-primary">Agregar hora para esta fecha</button>
                     </div>
                 </div>
-                <!-- Se removió el formulario semanal: usar arriba el calendario para agregar horarios -->
+
+                <h2 class="text-center mb-4">Agregar horarios (por semana)</h2>
+
+                <form id="form-turno" class="p-3">
+        <div class="row g-3">
+            <div class="col-md-6">
+            <label for="dia" class="form-label">Día:</label>
+            <select id="dia" class="form-select" required>
+                <option value="">Seleccionar...</option>
+                <option value="Lunes">Lunes</option>
+                <option value="Martes">Martes</option>
+                <option value="Miércoles">Miércoles</option>
+                <option value="Jueves">Jueves</option>
+                <option value="Viernes">Viernes</option>
+            </select>
+            </div>
+
+            <div class="col-md-6">
+            <label for="hora" class="form-label">Hora:</label>
+            <input type="time" id="hora" class="form-control" required>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn">Agregar horario</button>
+        </div>
+        </form>
     </section>
 
     <section>
