@@ -92,48 +92,81 @@ document.addEventListener("DOMContentLoaded", async function () {
         for (let y = startYear; y <= displayedYear + 2; y++) { const o=document.createElement('option'); o.value=y; o.textContent=y; yearSelect.appendChild(o); }
         yearSelect.value = displayedYear;
 
+        function getISOWeekNumber(d) {
+            const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            const dayNum = date.getUTCDay() || 7;
+            date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+            return Math.ceil((((date - yearStart) / 86400000) + 1)/7);
+        }
+
         function render() {
             const first = new Date(displayedYear, displayedMonth, 1);
             mesAnio.textContent = `${first.toLocaleString('es-ES',{month:'long'})} ${first.getFullYear()}`;
             calendarEl.innerHTML = '';
-            const header = document.createElement('div'); header.className='d-flex gap-2 mb-2';
-            ['D','L','M','M','J','V','S'].forEach(ch=>{ const h=document.createElement('div'); h.style.width='40px'; h.style.textAlign='center'; h.textContent=ch; header.appendChild(h); });
-            calendarEl.appendChild(header);
+
+            // header row
+            const headerRow = document.createElement('div'); headerRow.className = 'calendar-grid';
+            const weekLabel = document.createElement('div'); weekLabel.className = 'calendar-weeklabel'; weekLabel.textContent = 'Wk'; headerRow.appendChild(weekLabel);
+            ['D','L','M','M','J','V','S'].forEach(ch=>{ const h=document.createElement('div'); h.style.textAlign='center'; h.textContent=ch; headerRow.appendChild(h); });
+            calendarEl.appendChild(headerRow);
 
             const startDay = first.getDay();
             const daysInMonth = new Date(first.getFullYear(), first.getMonth()+1, 0).getDate();
-            const grid = document.createElement('div'); grid.className='calendar-grid';
-            for (let i=0;i<startDay;i++){ const e=document.createElement('div'); e.className='calendar-cell'; e.style.visibility='hidden'; grid.appendChild(e); }
-            for (let d=1; d<=daysInMonth; d++){
-                const cell = document.createElement('div'); cell.className='calendar-cell';
-                const dateObj = new Date(first.getFullYear(), first.getMonth(), d);
-                const weekday = nameFromNumber(dateObj.getDay());
-                const byDate = turnos.filter(t => t.fecha && (new Date(t.fecha)).toDateString() === dateObj.toDateString());
-                const byWeekday = turnos.filter(t => !t.fecha && t.dia === weekday);
-                if (byDate.length>0 || byWeekday.length>0) { cell.classList.add('has-available'); }
-                const now = new Date(); if (dateObj.toDateString() === now.toDateString()) cell.classList.add('today');
+            const weeks = Math.ceil((startDay + daysInMonth) / 7);
+            let selectedProfDate = null;
 
-                cell.textContent = d;
-                cell.addEventListener('click', ()=>{
-                    fechaProfText.textContent = `${weekday} ${d}/${first.getMonth()+1}/${first.getFullYear()}`;
-                    timesList.innerHTML='';
-                    const all = byDate.concat(byWeekday.map((t,idx)=> ({...t, idx: turnos.indexOf(t)})));
-                    all.forEach(t=>{ const el=document.createElement('div'); el.textContent = `${t.hora} — ${t.alumno || 'Libre'}`; timesList.appendChild(el); });
-                    timesWrap.style.display='block';
-                    addBtn.onclick = async ()=>{
-                        const hora = nuevaHora.value;
-                        if(!hora) return alert('Elegí una hora');
-                        const newTurno = { dia: weekday, hora, materia:null, alumno:null, editando:false, fecha: new Date(first.getFullYear(), first.getMonth(), d).toISOString() };
-                        turnos.push(newTurno);
-                        await saveRecord();
-                        render();
-                        mostrarTurnos();
-                        mostrarMensaje('Hora agregada para la fecha');
-                    };
-                });
-                grid.appendChild(cell);
+            for (let w = 0; w < weeks; w++) {
+                const row = document.createElement('div'); row.className = 'calendar-grid';
+                const weekStartIndex = w * 7 - startDay + 1;
+                let refDay = weekStartIndex; if (refDay < 1) refDay = 1; if (refDay > daysInMonth) refDay = daysInMonth;
+                const refDate = new Date(first.getFullYear(), first.getMonth(), refDay);
+                const wkNo = getISOWeekNumber(refDate);
+
+                const wkCell = document.createElement('div'); wkCell.className = 'calendar-weeknum'; wkCell.textContent = wkNo; row.appendChild(wkCell);
+
+                for (let d = 0; d < 7; d++) {
+                    const dayNumber = w * 7 + d - startDay + 1;
+                    if (dayNumber < 1 || dayNumber > daysInMonth) { const empty=document.createElement('div'); empty.className='calendar-cell'; empty.style.visibility='hidden'; row.appendChild(empty); continue; }
+
+                    const cell = document.createElement('div'); cell.className='calendar-cell';
+                    const dateObj = new Date(first.getFullYear(), first.getMonth(), dayNumber);
+                    const weekday = nameFromNumber(dateObj.getDay());
+                    const byDate = turnos.filter(t => t.fecha && (new Date(t.fecha)).toDateString() === dateObj.toDateString());
+                    const byWeekday = turnos.filter(t => !t.fecha && t.dia === weekday);
+                    if (byDate.length>0 || byWeekday.length>0) cell.classList.add('has-available');
+                    const now = new Date(); if (dateObj.toDateString() === now.toDateString()) cell.classList.add('today');
+
+                    cell.textContent = dayNumber;
+                    cell.addEventListener('click', ()=>{
+                        selectedProfDate = dateObj;
+                        const wk = getISOWeekNumber(dateObj);
+                        fechaProfText.textContent = `${weekday} ${dayNumber}/${first.getMonth()+1}/${first.getFullYear()} — Semana ${wk}`;
+                        timesList.innerHTML='';
+                        const all = byDate.concat(byWeekday.map((t,idx)=> ({...t, idx: turnos.indexOf(t)})));
+                        all.forEach(t=>{ const el=document.createElement('div'); el.textContent = `${t.hora} — ${t.alumno || 'Libre'}`; timesList.appendChild(el); });
+                        timesWrap.style.display='block';
+                    });
+                    row.appendChild(cell);
+                }
+
+                // attach add button behavior outside cell creation
+                // addBtn will use selectedProfDate when clicked
+                calendarEl.appendChild(row);
             }
-            calendarEl.appendChild(grid);
+
+            addBtn.onclick = async ()=>{
+                if (!selectedProfDate) return alert('Primero seleccioná una fecha en el calendario');
+                const hora = nuevaHora.value;
+                if(!hora) return alert('Elegí una hora');
+                const weekday = nameFromNumber(selectedProfDate.getDay());
+                const newTurno = { dia: weekday, hora, materia:null, alumno:null, editando:false, fecha: selectedProfDate.toISOString(), weekNumber: getISOWeekNumber(selectedProfDate) };
+                turnos.push(newTurno);
+                await saveRecord();
+                render();
+                mostrarTurnos();
+                mostrarMensaje('Hora agregada para la fecha');
+            };
         }
 
         prev.addEventListener('click', ()=>{ if (displayedMonth===0){ displayedMonth=11; displayedYear--; } else displayedMonth--; monthSelect.value=displayedMonth; yearSelect.value=displayedYear; render(); });

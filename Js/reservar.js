@@ -99,45 +99,78 @@ document.addEventListener("DOMContentLoaded", async function () {
         monthSelect.addEventListener('change', (e) => { displayedMonth = parseInt(e.target.value,10); renderCalendar(); });
         yearSelect.addEventListener('change', (e) => { displayedYear = parseInt(e.target.value,10); renderCalendar(); });
 
+        function getISOWeekNumber(d) {
+            const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            // ISO week date weeks start on Monday, so correct the day number
+            const dayNum = date.getUTCDay() || 7;
+            date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+            const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1)/7);
+            return weekNo;
+        }
+
         function renderCalendar() {
             const firstOfMonth = new Date(displayedYear, displayedMonth, 1);
             const year = firstOfMonth.getFullYear();
             const month = firstOfMonth.getMonth();
 
             calendarEl.innerHTML = '';
-            const header = document.createElement('div'); header.className='d-flex gap-2 mb-2';
-            ['D','L','M','M','J','V','S'].forEach(ch=>{ const h=document.createElement('div'); h.style.width='48px'; h.style.textAlign='center'; h.textContent=ch; header.appendChild(h); });
-            calendarEl.appendChild(header);
+
+            // header row: empty week label + weekdays
+            const headerRow = document.createElement('div'); headerRow.className = 'calendar-grid';
+            const weekLabel = document.createElement('div'); weekLabel.className = 'calendar-weeklabel'; weekLabel.textContent = 'Wk'; headerRow.appendChild(weekLabel);
+            const weekDays = ['D','L','M','M','J','V','S'];
+            weekDays.forEach(ch=>{ const h=document.createElement('div'); h.className='calendar-weekday'; h.style.textAlign='center'; h.textContent=ch; headerRow.appendChild(h); });
+            calendarEl.appendChild(headerRow);
 
             const startDay = firstOfMonth.getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const grid = document.createElement('div'); grid.className='calendar-grid';
+            const weeks = Math.ceil((startDay + daysInMonth) / 7);
 
-            for (let i = 0; i < startDay; i++) { const e=document.createElement('div'); e.className='calendar-cell'; e.style.visibility='hidden'; grid.appendChild(e); }
+            for (let w = 0; w < weeks; w++) {
+                const row = document.createElement('div'); row.className = 'calendar-grid';
+                // compute the date of the Monday (or first day) of this week
+                const weekStartIndex = w * 7 - startDay + 1; // day number in month
+                let refDay = weekStartIndex;
+                if (refDay < 1) refDay = 1;
+                if (refDay > daysInMonth) refDay = daysInMonth;
+                const refDate = new Date(year, month, refDay);
+                const wkNo = getISOWeekNumber(refDate);
 
-            for (let d = 1; d <= daysInMonth; d++) {
-                const cell = document.createElement('div'); cell.className='calendar-cell';
-                const dateObj = new Date(year, month, d);
-                const weekdayName = nameFromNumber(dateObj.getDay());
+                const wkCell = document.createElement('div'); wkCell.className = 'calendar-weeknum'; wkCell.textContent = wkNo; row.appendChild(wkCell);
 
-                // availability: by exact fecha or by weekday slots
-                const byDate = turnos.filter(t => t.fecha && (new Date(t.fecha)).toDateString() === dateObj.toDateString() && !t.alumno);
-                const byWeekday = turnos.filter(t => !t.fecha && t.dia === weekdayName && !t.alumno);
-                if (byDate.length > 0 || byWeekday.length > 0) cell.classList.add('has-available');
-                if (new Date().toDateString() === dateObj.toDateString()) cell.classList.add('today');
+                for (let d = 0; d < 7; d++) {
+                    const dayNumber = w * 7 + d - startDay + 1;
+                    if (dayNumber < 1 || dayNumber > daysInMonth) {
+                        const empty = document.createElement('div'); empty.className = 'calendar-cell'; empty.style.visibility = 'hidden'; row.appendChild(empty);
+                        continue;
+                    }
 
-                cell.textContent = d;
-                cell.addEventListener('click', () => selectDate(dateObj));
-                grid.appendChild(cell);
+                    const cell = document.createElement('div'); cell.className = 'calendar-cell';
+                    const dateObj = new Date(year, month, dayNumber);
+                    const weekdayName = nameFromNumber(dateObj.getDay());
+
+                    const byDate = turnos.filter(t => t.fecha && (new Date(t.fecha)).toDateString() === dateObj.toDateString() && !t.alumno);
+                    const byWeekday = turnos.filter(t => !t.fecha && t.dia === weekdayName && !t.alumno);
+                    if (byDate.length > 0 || byWeekday.length > 0) cell.classList.add('has-available');
+                    if (new Date().toDateString() === dateObj.toDateString()) cell.classList.add('today');
+
+                    cell.textContent = dayNumber;
+                    cell.addEventListener('click', () => selectDate(dateObj));
+                    row.appendChild(cell);
+                }
+
+                calendarEl.appendChild(row);
             }
-
-            calendarEl.appendChild(grid);
         }
 
         function selectDate(dateObj) {
             fechaReserva.value = dateObj.toISOString();
             const weekdayName = nameFromNumber(dateObj.getDay());
-            fechaSeleccionadaText.textContent = `${weekdayName} ${dateObj.getDate()}/${dateObj.getMonth()+1}/${dateObj.getFullYear()}`;
+            const wkNo = getISOWeekNumber(dateObj);
+            // store week number in hidden input if present
+            const wkInput = document.getElementById('weekNumber'); if (wkInput) wkInput.value = wkNo;
+            fechaSeleccionadaText.textContent = `${weekdayName} ${dateObj.getDate()}/${dateObj.getMonth()+1}/${dateObj.getFullYear()} — Semana ${wkNo}`;
 
             const disponibles = turnos
                 .map((t, idx) => ({...t, idx}))
@@ -191,8 +224,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (turnos[i].fecha) {
             const d = new Date(turnos[i].fecha);
             turnos[i].diaNumero = d.getDate();
+            const wkInput = document.getElementById('weekNumber');
+            turnos[i].weekNumber = wkInput ? parseInt(wkInput.value,10) : getISOWeekNumber(d);
         } else {
             turnos[i].diaNumero = null;
+            turnos[i].weekNumber = null;
         }
 
         await saveRecord();
