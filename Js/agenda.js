@@ -15,48 +15,91 @@ document.addEventListener("DOMContentLoaded", async function () {
     let turnos = [];
 
     async function cargarTurnos() {
-    const res = await fetch(BIN_URL, {
-        headers: { "X-Master-Key": API_KEY }
-    });
-    const data = await res.json();
-    turnos = data.record.turnos || [];
-    // messages may exist
-    window.__messages = data.record.messages || [];
-    mostrarTurnos();
-    // render professor calendar after loading
-    try { renderProfessorCalendar(); } catch(e){ /* ignore if UI missing */ }
+        const res = await fetch(BIN_URL, {
+            headers: { "X-Master-Key": API_KEY }
+        });
+        const data = await res.json();
+        turnos = data.record.turnos || [];
+        // messages may exist
+        window.__messages = data.record.messages || [];
+        mostrarTurnos();
+        // render professor calendar after loading
+        try { renderProfessorCalendar(); } catch(e){ /* ignore if UI missing */ }
     }
 
     async function saveRecord() {
-    const current = await (await fetch(BIN_URL, { headers: { "X-Master-Key": API_KEY } })).json();
-    const record = current.record || {};
-    record.turnos = turnos;
-    record.messages = window.__messages || [];
-    await fetch(BIN_URL, {
-        method: "PUT",
-        headers: {
-        "Content-Type": "application/json",
-        "X-Master-Key": API_KEY
-        },
-        body: JSON.stringify(record)
-    });
+        const current = await (await fetch(BIN_URL, { headers: { "X-Master-Key": API_KEY } })).json();
+        const record = current.record || {};
+        record.turnos = turnos;
+        record.messages = window.__messages || [];
+        await fetch(BIN_URL, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Master-Key": API_KEY
+            },
+            body: JSON.stringify(record)
+        });
     }
 
     function mostrarMensaje(texto, tipo = "exito") {
-    mensaje.textContent = texto;
-    mensaje.className = `mensaje ${tipo} mostrar`;
-    setTimeout(() => mensaje.classList.remove("mostrar"), 3000);
+        mensaje.textContent = texto;
+        mensaje.className = `mensaje ${tipo} mostrar`;
+        setTimeout(() => mensaje.classList.remove("mostrar"), 3000);
     } 
 
     function mostrarTurnos() {
-    tabla.innerHTML = "";
+        tabla.innerHTML = "";
 
-    if (turnos.length === 0) {
-        tabla.innerHTML = "<tr><td colspan='5'>No hay horarios cargados.</td></tr>";
-        return;
+        // always render calendar UI (so month/year selectors exist)
+        // Table shows turnos; if none, still show calendar
+        if (turnos.length === 0) {
+            tabla.innerHTML = "<tr><td colspan='5'>No hay horarios cargados.</td></tr>";
+            return;
+        }
+
+        for (let i = 0; i < turnos.length; i++) {
+            const t = turnos[i];
+
+            if (t.editando) {
+                tabla.innerHTML += `
+                    <tr>
+                    <td>
+                        <select id="dia-${i}">
+                        <option value="Lunes" ${t.dia === "Lunes" ? "selected" : ""}>Lunes</option>
+                        <option value="Martes" ${t.dia === "Martes" ? "selected" : ""}>Martes</option>
+                        <option value="Miércoles" ${t.dia === "Miércoles" ? "selected" : ""}>Miércoles</option>
+                        <option value="Jueves" ${t.dia === "Jueves" ? "selected" : ""}>Jueves</option>
+                        <option value="Viernes" ${t.dia === "Viernes" ? "selected" : ""}>Viernes</option>
+                        </select>
+                    </td>
+                    <td><input type="time" id="hora-${i}" value="${t.hora}"></td>
+                    <td><input type="text" id="materia-${i}" value="${t.materia || ""}"></td>
+                    <td><input type="text" id="alumno-${i}" value="${t.alumno || ""}"></td>
+                    <td>
+                        <button class="guardar" data-index="${i}">Guardar</button>
+                        <button class="cancelar" data-index="${i}">Cancelar</button>
+                    </td>
+                    </tr>`;
+            } else {
+                const fechaMostrar = t.fecha ? (() => { const d=new Date(t.fecha); return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}` })() : '-';
+                tabla.innerHTML += `
+                    <tr>
+                    <td>${t.dia}</td>
+                    <td>${t.hora}</td>
+                    <td>${fechaMostrar}</td>
+                    <td>${t.materia || "-"}</td>
+                    <td>${t.alumno || "-"}</td>
+                    <td>
+                        <button class="editar" data-index="${i}">Editar</button>
+                        <button class="eliminar" data-index="${i}">Eliminar</button>
+                    </td>
+                    </tr>`;
+            }
+        }
     }
 
-    // Professor calendar rendering
+    // Professor calendar rendering - top-level so it's available always
     function nameFromNumber(n) {
         const arr = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
         return arr[n];
@@ -176,101 +219,60 @@ document.addEventListener("DOMContentLoaded", async function () {
         render();
     }
 
-    for (let i = 0; i < turnos.length; i++) {
-        const t = turnos[i];
-
-        if (t.editando) {
-        tabla.innerHTML += `
-            <tr>
-            <td>
-                <select id="dia-${i}">
-                <option value="Lunes" ${t.dia === "Lunes" ? "selected" : ""}>Lunes</option>
-                <option value="Martes" ${t.dia === "Martes" ? "selected" : ""}>Martes</option>
-                <option value="Miércoles" ${t.dia === "Miércoles" ? "selected" : ""}>Miércoles</option>
-                <option value="Jueves" ${t.dia === "Jueves" ? "selected" : ""}>Jueves</option>
-                <option value="Viernes" ${t.dia === "Viernes" ? "selected" : ""}>Viernes</option>
-                </select>
-            </td>
-            <td><input type="time" id="hora-${i}" value="${t.hora}"></td>
-            <td><input type="text" id="materia-${i}" value="${t.materia || ""}"></td>
-            <td><input type="text" id="alumno-${i}" value="${t.alumno || ""}"></td>
-            <td>
-                <button class="guardar" data-index="${i}">Guardar</button>
-                <button class="cancelar" data-index="${i}">Cancelar</button>
-            </td>
-            </tr>`;
-        } else {
-        const fechaMostrar = t.fecha ? (() => { const d=new Date(t.fecha); return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}` })() : '-';
-        tabla.innerHTML += `
-            <tr>
-            <td>${t.dia}</td>
-            <td>${t.hora}</td>
-            <td>${fechaMostrar}</td>
-            <td>${t.materia || "-"}</td>
-            <td>${t.alumno || "-"}</td>
-            <td>
-                <button class="editar" data-index="${i}">Editar</button>
-                <button class="eliminar" data-index="${i}">Eliminar</button>
-            </td>
-            </tr>`;
-        }
-    }
-    }
-
     form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+        event.preventDefault();
 
-    const dia = document.getElementById("dia").value;
-    const hora = document.getElementById("hora").value;
+        const dia = document.getElementById("dia").value;
+        const hora = document.getElementById("hora").value;
 
-    turnos.push({
-        dia,
-        hora,
-        materia: null,
-        alumno: null,
-        editando: false
-    });
+        turnos.push({
+            dia,
+            hora,
+            materia: null,
+            alumno: null,
+            editando: false
+        });
 
-    await saveRecord();
-    mostrarTurnos();
-    mostrarMensaje("Nuevo horario agregado correctamente");
-    form.reset();
+        await saveRecord();
+        mostrarTurnos();
+        mostrarMensaje("Nuevo horario agregado correctamente");
+        form.reset();
     });
 
     tabla.addEventListener("click", async (event) => {
-    const boton = event.target;
-    const index = boton.dataset.index;
+        const boton = event.target;
+        const index = boton.dataset.index;
 
-    if (boton.classList.contains("editar")) {
-        turnos[index].editando = true;
-        mostrarTurnos();
-    }
-
-    if (boton.classList.contains("guardar")) {
-        turnos[index].dia = document.getElementById(`dia-${index}`).value;
-        turnos[index].hora = document.getElementById(`hora-${index}`).value;
-        turnos[index].materia = document.getElementById(`materia-${index}`).value.trim();
-        turnos[index].alumno = document.getElementById(`alumno-${index}`).value.trim();
-        turnos[index].editando = false;
-
-        await saveRecord();
-        mostrarTurnos();
-        mostrarMensaje("Horario actualizado con éxito");
-    }
-
-    if (boton.classList.contains("cancelar")) {
-        turnos[index].editando = false;
-        mostrarTurnos();
-    }
-
-    if (boton.classList.contains("eliminar")) {
-        if (confirm("¿Seguro que quieres eliminar este horario?")) {
-        turnos.splice(index, 1);
-        await saveRecord();
-        mostrarTurnos();
-        mostrarMensaje("Horario eliminado correctamente", "error");
+        if (boton.classList.contains("editar")) {
+            turnos[index].editando = true;
+            mostrarTurnos();
         }
-    }
+
+        if (boton.classList.contains("guardar")) {
+            turnos[index].dia = document.getElementById(`dia-${index}`).value;
+            turnos[index].hora = document.getElementById(`hora-${index}`).value;
+            turnos[index].materia = document.getElementById(`materia-${index}`).value.trim();
+            turnos[index].alumno = document.getElementById(`alumno-${index}`).value.trim();
+            turnos[index].editando = false;
+
+            await saveRecord();
+            mostrarTurnos();
+            mostrarMensaje("Horario actualizado con éxito");
+        }
+
+        if (boton.classList.contains("cancelar")) {
+            turnos[index].editando = false;
+            mostrarTurnos();
+        }
+
+        if (boton.classList.contains("eliminar")) {
+            if (confirm("¿Seguro que quieres eliminar este horario?")) {
+                turnos.splice(index, 1);
+                await saveRecord();
+                mostrarTurnos();
+                mostrarMensaje("Horario eliminado correctamente", "error");
+            }
+        }
     });
 
     await cargarTurnos();
