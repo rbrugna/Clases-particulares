@@ -204,10 +204,15 @@ onAuthStateChanged(auth, async (user) => {
 
   const role = await getMyRole(user.uid);
   if(role !== "teacher"){
-    // Si es la primera vez de Cynthia y querés auto-setear rol (NO recomendado):
-    // await ensureTeacherRole(user.uid);
-    els.authMsg.textContent = "Esta cuenta no tiene rol de profesora.";
-    await logout();
+    try {
+      // crear el rol de profesora en el primer login
+      await ensureTeacherRole(user.uid);
+      els.authMsg.textContent = "✅ Rol creado. Recarga la página.";
+      await logout();
+    } catch(e) {
+      els.authMsg.textContent = `Error al crear rol: ${e.message}`;
+      await logout();
+    }
     return;
   }
 

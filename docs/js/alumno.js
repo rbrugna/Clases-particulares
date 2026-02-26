@@ -257,9 +257,15 @@ onAuthStateChanged(auth, async (user) => {
 
   const role = await getMyRole(user.uid);
   if(role !== "student"){
-    els.authMsg.textContent = "Tu cuenta no es de alumno/a.";
-    // desconectamos para que el usuario no se quede "loggeado" sin poder avanzar
-    await logout();
+    try {
+      // crear el rol de alumno en el primer login
+      await ensureRoleStudent(user.uid);
+      els.authMsg.textContent = "✅ Rol creado. Recarga la página.";
+      await logout();
+    } catch(e) {
+      els.authMsg.textContent = `Error al crear rol: ${e.message}`;
+      await logout();
+    }
     return;
   }
 

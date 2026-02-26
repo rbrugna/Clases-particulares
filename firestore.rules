@@ -20,7 +20,10 @@ service cloud.firestore {
 
     match /roles/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
-      allow write: if isTeacher(); // solo la profesora (o admin) puede asignar roles
+      // crear el rol propio en el primer login (student o teacher)
+      allow create: if request.auth.uid == uid && (request.resource.data.role == "teacher" || request.resource.data.role == "student");
+      allow update: if isTeacher();
+      allow delete: if isTeacher();
     }
 
     match /users/{uid} {
