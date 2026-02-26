@@ -42,14 +42,14 @@ service cloud.firestore {
       // profesora ve todo, alumno ve lo suyo
       allow read: if isTeacher() || (signedIn() && resource.data.studentUid == request.auth.uid);
 
-      // alumno crea reserva propia
-      allow create: if isStudent()
+      // alumno crea reserva propia (sin requerir rol verificado)
+      allow create: if signedIn()
         && request.resource.data.studentUid == request.auth.uid
         && request.resource.data.status == "active";
 
       // alumno solo puede cancelar su reserva (pasar a canceled)
       allow update: if isTeacher()
-        || (isStudent()
+        || (signedIn()
             && resource.data.studentUid == request.auth.uid
             && resource.data.status == "active"
             && request.resource.data.status == "canceled");

@@ -101,29 +101,39 @@ async function renderBlocks(){
     return;
   }
 
-  const blocks = await getBlocks(selectedISO);
-  if(blocks.length === 0){
-    els.blocksEmpty.textContent = "No hay bloques cargados.";
-    return;
-  }
+  try {
+    const blocks = await getBlocks(selectedISO);
+    if(blocks.length === 0){
+      els.blocksEmpty.textContent = "No hay bloques cargados.";
+      return;
+    }
 
-  blocks.forEach((b, idx) => {
-    const row = document.createElement("div");
-    row.className = "slot";
-    row.innerHTML = `
-      <div>
-        <div class="slot__time">${b.start} → ${b.end}</div>
-        <div class="small muted">Bloque disponible</div>
-      </div>
-      <button class="btn btn--ghost">Eliminar</button>
-    `;
-    row.querySelector("button").addEventListener("click", async () => {
-      const next = blocks.filter((_,i)=>i!==idx);
-      await setBlocks(selectedISO, next);
-      await renderBlocks();
+    blocks.forEach((b, idx) => {
+      const row = document.createElement("div");
+      row.className = "slot";
+      row.innerHTML = `
+        <div>
+          <div class="slot__time">${b.start} → ${b.end}</div>
+          <div class="small muted">Bloque disponible</div>
+        </div>
+        <button class="btn btn--ghost">Eliminar</button>
+      `;
+      row.querySelector("button").addEventListener("click", async () => {
+        try {
+          const next = blocks.filter((_,i)=>i!==idx);
+          await setBlocks(selectedISO, next);
+          await renderBlocks();
+        } catch(e) {
+          console.error("Error al eliminar bloque:", e);
+          alert(`Error: ${e.message}`);
+        }
+      });
+      els.blocksList.appendChild(row);
     });
-    els.blocksList.appendChild(row);
-  });
+  } catch(e) {
+    console.error("Error al cargar bloques:", e);
+    els.blocksEmpty.textContent = `Error: ${e.message}`;
+  }
 }
 
 function listenDayBookings(){
@@ -185,14 +195,19 @@ els.btnAddBlock.addEventListener("click", async () => {
   if(!start || !end) return alert("Completá inicio y fin.");
   if(end <= start) return alert("El fin debe ser mayor al inicio.");
 
-  const blocks = await getBlocks(selectedISO);
-  blocks.push({ start, end });
-  blocks.sort((a,b)=>a.start.localeCompare(b.start));
-  await setBlocks(selectedISO, blocks);
+  try {
+    const blocks = await getBlocks(selectedISO);
+    blocks.push({ start, end });
+    blocks.sort((a,b)=>a.start.localeCompare(b.start));
+    await setBlocks(selectedISO, blocks);
 
-  els.blockStart.value = "";
-  els.blockEnd.value = "";
-  await renderBlocks();
+    els.blockStart.value = "";
+    els.blockEnd.value = "";
+    await renderBlocks();
+  } catch(e) {
+    console.error("Error al agregar bloque:", e);
+    alert(`Error: ${e.message}`);
+  }
 });
 
 onAuthStateChanged(auth, async (user) => {

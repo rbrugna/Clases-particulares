@@ -113,57 +113,67 @@ async function renderSlots(){
     els.slotsEmpty.textContent = "Escribí la materia/tema para reservar.";
   }
 
-  const blocks = await loadAvailability(selectedISO);
-  const bookings = await loadActiveBookingsForDate(selectedISO);
+  try {
+    const blocks = await loadAvailability(selectedISO);
+    const bookings = await loadActiveBookingsForDate(selectedISO);
 
-  const possible = computeSlots(blocks, bookings, durationMin);
+    const possible = computeSlots(blocks, bookings, durationMin);
 
-  if(possible.length === 0){
-    els.slotsEmpty.textContent = "No hay horarios disponibles para esa duración.";
-    return;
-  }
+    if(possible.length === 0){
+      els.slotsEmpty.textContent = "No hay horarios disponibles para esa duración.";
+      return;
+    }
 
-  for(const s of possible){
-    const row = document.createElement("div");
-    row.className = "slot";
-    row.innerHTML = `
-      <div>
-        <div class="slot__time">${s.start} → ${s.end}</div>
-        <div class="small muted">Disponible</div>
-      </div>
-      <button class="btn">Reservar</button>
-    `;
-    row.querySelector("button").addEventListener("click", async () => {
-      const subject = els.subject.value.trim();
-      if(!subject) return alert("Poné la materia/tema.");
+    for(const s of possible){
+      const row = document.createElement("div");
+      row.className = "slot";
+      row.innerHTML = `
+        <div>
+          <div class="slot__time">${s.start} → ${s.end}</div>
+          <div class="small muted">Disponible</div>
+        </div>
+        <button class="btn">Reservar</button>
+      `;
+      row.querySelector("button").addEventListener("click", async () => {
+        const subject = els.subject.value.trim();
+        if(!subject) return alert("Poné la materia/tema.");
 
-      const userSnap = await getDoc(doc(db,"users",currentUser.uid));
-      const studentName = userSnap.exists() ? (userSnap.data().displayName || "") : "";
+        try {
+          const userSnap = await getDoc(doc(db,"users",currentUser.uid));
+          const studentName = userSnap.exists() ? (userSnap.data().displayName || "") : "";
 
-      await addDoc(collection(db, "bookings"), {
-        date: selectedISO,
-        start: s.start,
-        end: s.end,
-        durationMin,
-        subject,
-        studentUid: currentUser.uid,
-        studentName,
-        status: "active",
-        createdAt: serverTimestamp()
+          await addDoc(collection(db, "bookings"), {
+            date: selectedISO,
+            start: s.start,
+            end: s.end,
+            durationMin,
+            subject,
+            studentUid: currentUser.uid,
+            studentName,
+            status: "active",
+            createdAt: serverTimestamp()
+          });
+
+          // WhatsApp (no rompe la reserva si falla)
+          try{
+            const notify = httpsCallable(fx, "notifyTeacherWhatsApp");
+            await notify({ date: selectedISO, start: s.start, end: s.end, durationMin, subject });
+          }catch(e){
+            console.warn("WhatsApp notify failed:", e?.message);
+          }
+
+          alert("✅ Reserva confirmada.");
+        } catch(e) {
+          console.error("Error al crear reserva:", e);
+          alert(`Error: ${e.message}`);
+        }
       });
 
-      // WhatsApp (no rompe la reserva si falla)
-      try{
-        const notify = httpsCallable(fx, "notifyTeacherWhatsApp");
-        await notify({ date: selectedISO, start: s.start, end: s.end, durationMin, subject });
-      }catch(e){
-        console.warn("WhatsApp notify failed:", e?.message);
-      }
-
-      alert("✅ Reserva confirmada.");
-    });
-
-    els.slotsList.appendChild(row);
+      els.slotsList.appendChild(row);
+    }
+  } catch(e) {
+    console.error("Error al cargar horarios:", e);
+    els.slotsEmpty.textContent = `Error: ${e.message}`;
   }
 }
 
