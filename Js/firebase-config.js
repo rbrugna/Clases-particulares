@@ -1,6 +1,4 @@
-// Shared Firebase configuration and initialized services
-// Replace the placeholders below with your Firebase Web app config
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Js/firebase-config.js
 const firebaseConfig = {
   apiKey: "AIzaSyCLMTSYxCBXS5P9zARGOrwyffAzDj7XU4E",
   authDomain: "clases-particulares-1ba72.firebaseapp.com",
@@ -11,12 +9,13 @@ const firebaseConfig = {
   measurementId: "G-C8KN11E4X1"
 };
 
-export const PROFESSOR_EMAIL = 'cyfernan@gmail.com'; // replace with the professor's Firebase email
+export const PROFESSOR_EMAIL = 'cyfernan@gmail.com';
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
 import { getAuth } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
 import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
 
 const app = initializeApp(firebaseConfig);
+
 export const auth = getAuth(app);
 export const db = getFirestore(app);
