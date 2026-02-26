@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Profesora | Cynthia Fernández</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="./index.html">
+        <div class="brand__logo">CF</div>
+        <div>
+          <div class="brand__title">Cynthia Fernández</div>
+          <div class="brand__subtitle">Panel Profesora</div>
+        </div>
+      </a>
+      <button class="btn btn--ghost" id="btnLogout">Salir</button>
+    </div>
+  </header>
+
+  <main class="container grid-2">
+    <section class="card" id="authCard">
+      <h2>Login Profesora</h2>
+      <p class="muted">Acceso solo para Cynthia.</p>
+      <div class="form">
+        <label class="label">Email</label>
+        <input class="input" id="email" type="email" />
+        <label class="label">Contraseña</label>
+        <input class="input" id="password" type="password" />
+        <button class="btn" id="btnLogin">Entrar</button>
+        <div class="small muted" id="authMsg"></div>
+      </div>
+    </section>
+
+    <section class="card" id="appCard" style="display:none;">
+      <h2>Disponibilidad & Agenda</h2>
+      <p class="muted">Cargá bloques por día y administrá reservas.</p>
+
+      <div class="calendar__toolbar">
+        <button class="btn btn--ghost" id="prevMonth">←</button>
+        <div id="monthTitle" style="font-weight:700;"></div>
+        <button class="btn btn--ghost" id="nextMonth">→</button>
+      </div>
+      <div class="calendar__grid" id="calendarGrid"></div>
+
+      <div class="divider"></div>
+
+      <div class="row">
+        <div>
+          <div class="label">Día seleccionado</div>
+          <div id="selectedDate" style="font-weight:700;">—</div>
+        </div>
+        <div>
+          <div class="label">Bloque inicio</div>
+          <input class="input" id="blockStart" type="time" />
+        </div>
+        <div>
+          <div class="label">Bloque fin</div>
+          <input class="input" id="blockEnd" type="time" />
+        </div>
+        <button class="btn" id="btnAddBlock">Agregar bloque</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <h3>Bloques del día</h3>
+      <div id="blocksList"></div>
+      <div class="small muted" id="blocksEmpty"></div>
+
+      <div class="divider"></div>
+
+      <h3>Reservas del día</h3>
+      <div id="dayBookings"></div>
+      <div class="small muted" id="dayBookingsEmpty"></div>
+    </section>
+  </main>
+
+  <script type="module" src="./js/profesora.js"></script>
+</body>
+</html>

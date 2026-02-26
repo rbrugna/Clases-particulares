@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Alumno/a | Cynthia Fernández</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="./index.html">
+        <div class="brand__logo">CF</div>
+        <div>
+          <div class="brand__title">Cynthia Fernández</div>
+          <div class="brand__subtitle">Panel Alumno/a</div>
+        </div>
+      </a>
+      <button class="btn btn--ghost" id="btnLogout">Salir</button>
+    </div>
+  </header>
+
+  <main class="container grid-2">
+    <section class="card" id="authCard">
+      <h2>Ingresar / Registrarse</h2>
+      <p class="muted">Email + contraseña.</p>
+      <div class="form">
+        <label class="label">Nombre y apellido</label>
+        <input class="input" id="displayName" placeholder="Ej: Valentina Gómez" />
+
+        <label class="label">Email</label>
+        <input class="input" id="email" type="email" placeholder="tu@mail.com" />
+
+        <label class="label">Contraseña</label>
+        <input class="input" id="password" type="password" placeholder="mín 6 caracteres" />
+
+        <button class="btn" id="btnLogin">Entrar</button>
+        <button class="btn btn--ghost" id="btnRegister">Crear cuenta</button>
+
+        <div class="divider"></div>
+        <div class="small muted" id="authMsg"></div>
+      </div>
+    </section>
+
+    <section class="card" id="appCard" style="display:none;">
+      <h2>Calendario mensual</h2>
+      <p class="muted">Elegí día + duración, y reservá.</p>
+
+      <div class="calendar__toolbar">
+        <button class="btn btn--ghost" id="prevMonth">←</button>
+        <div id="monthTitle" style="font-weight:700;"></div>
+        <button class="btn btn--ghost" id="nextMonth">→</button>
+      </div>
+      <div class="calendar__grid" id="calendarGrid"></div>
+
+      <div class="divider"></div>
+
+      <div class="row">
+        <div>
+          <div class="label">Día seleccionado</div>
+          <div id="selectedDate" style="font-weight:700;">—</div>
+        </div>
+
+        <div>
+          <div class="label">Duración</div>
+          <select id="duration">
+            <option value="30">30 min</option>
+            <option value="60" selected>60 min</option>
+            <option value="90">90 min</option>
+            <option value="120">120 min</option>
+          </select>
+        </div>
+
+        <div style="min-width:220px;">
+          <div class="label">Materia / tema</div>
+          <input class="input" id="subject" placeholder="Ej: Análisis, SQL, Física..." />
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h3>Horarios disponibles</h3>
+      <div id="slotsList"></div>
+      <div class="small muted" id="slotsEmpty"></div>
+
+      <div class="divider"></div>
+
+      <h3>Mis reservas</h3>
+      <div id="myBookings"></div>
+      <div class="small muted" id="myBookingsEmpty"></div>
+    </section>
+  </main>
+
+  <script type="module" src="./js/alumno.js"></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+
+    function roleDocExists() {
+      return exists(/databases/$(database)/documents/roles/$(request.auth.uid));
+    }
+
+    function isTeacher() {
+      return signedIn() && roleDocExists()
+        && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role == "teacher";
+    }
+
+    function isStudent() {
+      return signedIn() && roleDocExists()
+        && get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.role == "student";
+    }
+
+    match /roles/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if isTeacher(); // solo la profesora (o admin) puede asignar roles
+    }
+
+    match /users/{uid} {
+      allow read: if isTeacher() || (signedIn() && request.auth.uid == uid);
+      allow create, update: if signedIn() && request.auth.uid == uid;
+      allow delete: if isTeacher();
+    }
+
+    // disponibilidad por fecha (YYYY-MM-DD)
+    match /availability/{dateISO} {
+      allow read: if signedIn();       // alumnos pueden leer
+      allow write: if isTeacher();     // solo profesora escribe
+    }
+
+    match /bookings/{bookingId} {
+      // profesora ve todo, alumno ve lo suyo
+      allow read: if isTeacher() || (signedIn() && resource.data.studentUid == request.auth.uid);
+
+      // alumno crea reserva propia
+      allow create: if isStudent()
+        && request.resource.data.studentUid == request.auth.uid
+        && request.resource.data.status == "active";
+
+      // alumno solo puede cancelar su reserva (pasar a canceled)
+      allow update: if isTeacher()
+        || (isStudent()
+            && resource.data.studentUid == request.auth.uid
+            && resource.data.status == "active"
+            && request.resource.data.status == "canceled");
+
+      allow delete: if isTeacher();
+    }
+  }
+}
