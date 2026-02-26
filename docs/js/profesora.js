@@ -207,6 +207,7 @@ onAuthStateChanged(auth, async (user) => {
     // Si es la primera vez de Cynthia y querés auto-setear rol (NO recomendado):
     // await ensureTeacherRole(user.uid);
     els.authMsg.textContent = "Esta cuenta no tiene rol de profesora.";
+    await logout();
     return;
   }
 

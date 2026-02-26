@@ -258,6 +258,8 @@ onAuthStateChanged(auth, async (user) => {
   const role = await getMyRole(user.uid);
   if(role !== "student"){
     els.authMsg.textContent = "Tu cuenta no es de alumno/a.";
+    // desconectamos para que el usuario no se quede "loggeado" sin poder avanzar
+    await logout();
     return;
   }
 
